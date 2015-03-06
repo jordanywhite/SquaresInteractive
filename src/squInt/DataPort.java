@@ -1,7 +1,7 @@
+package squInt;
 
 public class DataPort implements Runnable {
 
-	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 

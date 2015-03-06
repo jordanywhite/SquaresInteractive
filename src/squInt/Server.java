@@ -1,3 +1,4 @@
+package squInt;
 import java.net.InetAddress;
 import java.util.Hashtable;
 import java.util.Queue;
