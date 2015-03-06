@@ -2,8 +2,10 @@ package squInt;
 
 public class GUI {
 	
+
+	User user = new Server(new Room(5, 5));
 	DataPort gimmeData;
-	User user;
+	
 	
 	public static void main(String[] args) {
 		System.out.println("mahpwojeksizdabwest");

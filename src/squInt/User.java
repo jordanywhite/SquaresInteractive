@@ -7,4 +7,17 @@ public abstract class User {
 	int userId;
 	InetAddress myIp;
 	InetAddress serverIp;
+	
+	public User(Room room) {
+		this.room = room;
+	}
+	
+	public int getId() {
+		 return userId;
+	}
+	
+	public InetAddress getIpAddress() {
+		return myIp;
+	}
+	
 }
