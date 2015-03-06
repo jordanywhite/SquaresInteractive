@@ -1,5 +1,5 @@
 
-public class RoomProtocol implements Runnable {
+public class DataPort implements Runnable {
 
 	@Override
 	public void run() {

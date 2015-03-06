@@ -1,7 +1,7 @@
 
 public class GUI {
 	
-	RoomProtocol gimmeData;
+	DataPort gimmeData;
 	User user;
 	
 	public static void main(String[] args) {
