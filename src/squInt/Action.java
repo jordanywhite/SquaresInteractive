@@ -1,5 +1,5 @@
 package squInt;
 
 public enum Action {
-	MOVE_UP, MOVE_DOWW, MOVE_LEFT, MOVE_RIGHT, INTERACT
+	MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, INTERACT
 }

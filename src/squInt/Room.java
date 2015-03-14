@@ -1,20 +1,27 @@
 package squInt;
 
+/**
+ * A room that can have players in it.
+ * 
+ * Contains a grid of RoomTiles that represents what's inside the room.
+ *
+ */
 public class Room {
-
-	private int width;
-	private int height;
+	public static final int WIDTH = 5;
+	public static final int HEIGHT = 5;
 	
-	public Room(int width, int height) {
-		this.width = width;
-		this.height = height;
+	private RoomTile[][] tiles;
+	
+	public Room() {
+		tiles = new RoomTile[WIDTH][HEIGHT];
+		for(int j = 0; j < HEIGHT; j++) {
+			for(int i = 0; i < WIDTH; i++) {
+				tiles[i][j] = new RoomTile();
+			}
+		}
 	}
 	
-	public int getWidth() {
-		return width;
-	}
-	
-	public int getHeight() {
-		return height;
+	public RoomTile getTileAt(int xPos, int yPos) {
+		return tiles[xPos][yPos];
 	}
 }

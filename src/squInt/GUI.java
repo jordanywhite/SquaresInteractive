@@ -1,13 +1,20 @@
 package squInt;
 
-public class GUI {
-	
+import javax.swing.*;
 
-	User user = new Server(new Room(5, 5));
-	DataPort gimmeData;
+/**
+ * The GUI frame through which the player interacts
+ * with the program.
+ *
+ */
+public class GUI extends JFrame {
+	Server parent;
 	
+	public GUI() {
+		// build JFrame
+	}
 	
-	public static void main(String[] args) {
-		System.out.println("mahpwojeksizdabwest");
+	public void refresh(Room room) {
+		// update JFrame contents with latest room data
 	}
 }
