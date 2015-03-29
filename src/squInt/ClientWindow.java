@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,10 +26,15 @@ public class ClientWindow extends JPanel implements KeyListener {
 	public static final int TILE_DIM = CANVAS_DIM / TILES_DIM;	// the number of pixels per tile
 	
 	public Player player = null;
+	public ArrayList<User> players = null;
+	
+	
 
 	/** Constructor to setup the GUI components */
 	public ClientWindow() {
-		player = new Player(0,0,Player.DOWN, true);		
+		player = new Client(0,0,Player.DOWN, true, (int)(Math.random()*50000));	
+		players = new ArrayList<User>();
+		players.add((User)player);
 		
 		setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
 		
@@ -45,7 +51,12 @@ public class ClientWindow extends JPanel implements KeyListener {
 		Graphics2D g2d = (Graphics2D) g;
 		
 		drawGrid(TILES_DIM, g);	// Draw the room grid
-		drawPlayer(player.x, player.y, g2d);	// Draw the player
+//		drawPlayer(player.x, player.y, g2d);	// Draw the player
+		
+		// Draw everyone connected to the server
+		for(Player p : players) {
+			drawPlayer(p.x, p.y, g2d);	// Draw the player
+		}
 	}
 
 	/**
@@ -104,39 +115,19 @@ public class ClientWindow extends JPanel implements KeyListener {
 	}
 	
 	private void moveRight() {
-		if ( player.direction != Player.RIGHT ) {
-			player.direction = Player.RIGHT;
-		} else if ( player.x < TILES_DIM - 1 ) {
-			player.x++;		
-	        player.startMoveTimer();	
-		}
+		player.moveRight();	
 	}
 	
 	private void moveUp() {
-		if ( player.direction != Player.UP ) {
-			player.direction = Player.UP;
-		} else if ( player.y > 0 ) {
-			player.y--;
-	        player.startMoveTimer();
-		}		
+		player.moveUp();		
 	}
 	
 	private void moveLeft() {
-		if ( player.direction != Player.LEFT ) {
-			player.direction = Player.LEFT;
-		} else if ( player.x > 0 ) {
-			player.x--;
-	        player.startMoveTimer();
-		}		
+		player.moveLeft();		
 	}
 	
 	private void moveDown() {
-		if ( player.direction != Player.DOWN ) {
-			player.direction = Player.DOWN;
-		} else if ( player.y < TILES_DIM - 1 ) {
-			player.y++;
-	        player.startMoveTimer();
-		}				
+		player.moveDown();				
 	}
 
 

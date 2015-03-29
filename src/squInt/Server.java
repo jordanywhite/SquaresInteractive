@@ -11,7 +11,7 @@ import java.util.Queue;
  */
 public class Server extends User {
 	
-	public static final int MAX_CLIENTS = 30;
+	public static final int MAX_CLIENTS = 30; //64
 	public static final int SERVER_ID = 0;
 	/*
 	 * Hash table with User ids connecected to ip addresses for interesting
@@ -31,7 +31,7 @@ public class Server extends User {
 
 	public Server() {
 		// Make a user with all the bells and whistles
-		super();
+		super(0,0,Player.DOWN,true,SERVER_ID);
 
 		// Make this server a proper user with an id and ip
 		setUserID(SERVER_ID);

@@ -19,9 +19,10 @@ public class Player {
 	public int y;						// the y location of the player using tile coordinates
 	public int direction;
 	public boolean allowedToMove;
+	public int playerID;
 	private Timer moveTimer = null;
 	
-	public Player(int tile_x, int tile_y, int direction, boolean canIMove) {
+	public Player(int tile_x, int tile_y, int direction, boolean canIMove, int id) {
 		if (tile_x < 0 || tile_x > ClientWindow.TILES_DIM) {
 			x = 0;
 		} else {
@@ -37,6 +38,7 @@ public class Player {
 		} else {
 			this.direction = direction;			
 		}
+		playerID = id;
 		allowedToMove = canIMove;
 	}
 	
@@ -52,4 +54,39 @@ public class Player {
 		}, MOVE_DELAY);
 	}
 	
+	public void moveRight() {
+		if ( direction != Player.RIGHT ) {
+			direction = Player.RIGHT;
+		} else if ( x < ClientWindow.TILES_DIM - 1 ) {
+			x++;		
+	        startMoveTimer();	
+		}
+	}
+	
+	public void moveUp() {
+		if ( direction != Player.UP ) {
+			direction = Player.UP;
+		} else if ( y > 0 ) {
+			y--;
+	        startMoveTimer();
+		}		
+	}
+	
+	public void moveLeft() {
+		if ( direction != Player.LEFT ) {
+			direction = Player.LEFT;
+		} else if ( x > 0 ) {
+			x--;
+	        startMoveTimer();
+		}		
+	}
+	
+	public void moveDown() {
+		if ( direction != Player.DOWN ) {
+			direction = Player.DOWN;
+		} else if ( y < ClientWindow.TILES_DIM - 1 ) {
+			y++;
+	        startMoveTimer();
+		}				
+	}
 }

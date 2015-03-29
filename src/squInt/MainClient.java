@@ -9,16 +9,19 @@ import java.net.*;
  */
 public class MainClient {
 	
+	private static final String ipAddr = "localhost";
+//	private static final String ipAddr = "10.12.18.33";
+	
 	public static void main(String[] args) {
-		Client client = new Client();
 		DataPortClient dpc = null; // the client's connection to the server
 		
 		try {
-			dpc = new DataPortClient("localhost", 9999);
+			dpc = new DataPortClient(ipAddr, 9999);
 			Thread serverPlayerThread = new Thread(dpc);
 			serverPlayerThread.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+//		Client client = new Client();
 	}
 }

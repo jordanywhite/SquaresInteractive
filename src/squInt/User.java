@@ -7,15 +7,14 @@ import java.net.InetAddress;
  * One User per host. Contains the local host's data.
  *
  */
-public abstract class User {
+public abstract class User extends Player{
 	private int userID;
 	private int[] otherUsers;
 	private Room room;
-	private GUI gui;
 
-	public User() {
+	public User(int x, int y, int direction, boolean ableToMove, int id) {		
+		super(x, y, direction, ableToMove, id);
 		this.room = new Room();
-		this.gui = new GUI();
 	}
 
 	public int getUserID() {
@@ -24,10 +23,6 @@ public abstract class User {
 
 	public Room getRoom() {
 		return room;
-	}
-
-	public GUI getGui() {
-		return gui;
 	}
 
 	public InetAddress getIp() {
@@ -45,10 +40,6 @@ public abstract class User {
 
 	public void setRoom(Room room) {
 		this.room = room;
-	}
-
-	public void setGui(GUI gui) {
-		this.gui = gui;
 	}
 
 }
