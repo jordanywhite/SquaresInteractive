@@ -1,11 +1,19 @@
-import java.awt.*;
-import java.awt.event.*;
+package squInt;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 // Swing Program Template
 @SuppressWarnings("serial")
-public class SquintMainWindow extends JPanel implements KeyListener {
+public class ClientWindow extends JPanel implements KeyListener {
 
 	public static final String TITLE = "...Squares Interactive GUI...";
 
@@ -19,7 +27,7 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 	public Player player = null;
 
 	/** Constructor to setup the GUI components */
-	public SquintMainWindow() {
+	public ClientWindow() {
 		player = new Player(0,0,Player.DOWN, true);		
 		
 		setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
@@ -138,7 +146,7 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame frame = new JFrame(TITLE);
-				frame.setContentPane(new SquintMainWindow());
+				frame.setContentPane(new ClientWindow());
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setResizable(false);
 				frame.pack();             // "this" JFrame packs its components

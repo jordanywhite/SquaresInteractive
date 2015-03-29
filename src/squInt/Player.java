@@ -1,3 +1,5 @@
+package squInt;
+
 import java.awt.Color;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,12 +22,12 @@ public class Player {
 	private Timer moveTimer = null;
 	
 	public Player(int tile_x, int tile_y, int direction, boolean canIMove) {
-		if (tile_x < 0 || tile_x > SquintMainWindow.TILES_DIM) {
+		if (tile_x < 0 || tile_x > ClientWindow.TILES_DIM) {
 			x = 0;
 		} else {
 			x = tile_x;
 		}
-		if (tile_y < 0 || tile_y > SquintMainWindow.TILES_DIM) {
+		if (tile_y < 0 || tile_y > ClientWindow.TILES_DIM) {
 			y = 0;
 		} else {
 			y = tile_y;
