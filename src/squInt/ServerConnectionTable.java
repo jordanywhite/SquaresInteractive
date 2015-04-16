@@ -71,6 +71,12 @@ public class ServerConnectionTable implements Runnable {
 					incMessages.add(new ServerQueuedMessage(dp, receivedMessage));
 				}
 			}
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -87,7 +93,8 @@ public class ServerConnectionTable implements Runnable {
 	 * @param msg
 	 */
 	public void sendToAll(String msg) {
-		for(DataPort dp : connections) {
+		CopyOnWriteArrayList<DataPort> connectionsCopy = new CopyOnWriteArrayList<DataPort>(connections);
+		for(DataPort dp : connectionsCopy) {
 			if(!dp.send(msg)) {
 				System.out.println("SEND FAILED: " + msg);
 			}
@@ -106,7 +113,8 @@ public class ServerConnectionTable implements Runnable {
 	 * @return a DataPort representing the connection
 	 */
 	public DataPort getConnectionByUniqueId(int id) {
-		for(DataPort dp : connections) {
+		CopyOnWriteArrayList<DataPort> connectionsCopy = new CopyOnWriteArrayList<DataPort>(connections);
+		for(DataPort dp : connectionsCopy) {
 			if (dp.getUniqueId() == id) {
 				return dp;
 			}

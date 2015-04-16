@@ -33,7 +33,13 @@ public class MainClient {
 		// ok, connection is established. 
 		
 		// wait until we receive a message
-		while (incMsgQueue.peek() == null) ;
+		while (incMsgQueue.peek() == null) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		// print the message!
 		// poll() also removes it from the queue

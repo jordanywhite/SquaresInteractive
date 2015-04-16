@@ -1,10 +1,16 @@
 package squInt;
 
-public class ActionPacket {
+/**
+ * pairs an action with a playerId. This will get converted into a
+ * string (helper methods are here to encode/decode) and sent over the
+ * network
+ *
+ */
+public class PlayerAction {
 	public int playerId;
 	public Action action;
 	
-	public ActionPacket(int playerId, Action action) {
+	public PlayerAction(int playerId, Action action) {
 		this.playerId = playerId;
 		this.action = action;
 	}
@@ -19,12 +25,12 @@ public class ActionPacket {
 		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionNum;
 	}
 	
-	public static ActionPacket parseFromMsg(String msg) {
+	public static PlayerAction parseFromMsg(String msg) {
 		if(!isValidMessage(msg)) {
 			return null;
 		}
 		
-		ActionPacket parsedPacket = null;
+		PlayerAction parsedPacket = null;
 		
 		try {
 			String[] splitMsg = msg.split("#");
@@ -36,7 +42,7 @@ public class ActionPacket {
 				Action action = getActionFromInt(Integer.parseInt(payload[1]));
 				
 				if(action != null) {
-					parsedPacket = new ActionPacket(playerId, action);
+					parsedPacket = new PlayerAction(playerId, action);
 				}
 			}
 			
