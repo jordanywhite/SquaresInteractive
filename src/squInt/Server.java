@@ -84,16 +84,16 @@ public class Server extends User {
 		myIpLookup.remove(id);
 	}
 
-	/**
-	 * requestAction Judge the worth of an action
-	 * 
-	 * @param action
-	 *            on which we shall act on
-	 * @return true if the action is worthy, false if the action is found
-	 *         wanting
-	 */
-	public boolean requestAction(ClientAction action) {
-		// TODO: Reaffirm mechanics
-		return true;
-	}
+//	/**
+//	 * requestAction Judge the worth of an action
+//	 * 
+//	 * @param action
+//	 *            on which we shall act on
+//	 * @return true if the action is worthy, false if the action is found
+//	 *         wanting
+//	 */
+//	public boolean requestAction(ClientAction action) {
+//		// TODO: Reaffirm mechanics
+//		return true;
+//	}
 }
