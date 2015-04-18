@@ -4,6 +4,17 @@ import java.awt.Color;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
+/**
+ * 
+ * Represents the player in our interactive room
+ * 
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
+ *
+ */
 public class Player {
 
 	public static final int DOWN = 0;

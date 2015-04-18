@@ -5,6 +5,11 @@ package squInt;
  * 
  * Contains a grid of RoomTiles that represents what's inside the room.
  *
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
+ *
  */
 public class Room {
 	public static final int WIDTH = 5;

@@ -12,6 +12,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+/**
+ * 
+ * Displays room as a Java Swing GUI
+ * 
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
+ */
 // Swing Program Template
 @SuppressWarnings("serial")
 public class ClientWindow extends JPanel implements KeyListener {

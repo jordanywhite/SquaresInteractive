@@ -8,6 +8,10 @@ import java.util.Queue;
 /**
  * The User object for the server.
  *
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
  */
 public class Server extends User {
 	

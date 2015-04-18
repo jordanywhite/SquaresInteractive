@@ -6,6 +6,11 @@ import java.util.LinkedList;
 
 /**
  * The main method for a client
+ * 
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
  *
  */
 public class MainClient {

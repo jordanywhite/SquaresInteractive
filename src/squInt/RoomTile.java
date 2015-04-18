@@ -5,6 +5,11 @@ package squInt;
  * 
  * This is a separate class so we can add functionality later (direction, etc)
  *
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
+ *
  */
 public class RoomTile {
 	private int occupantID; // userID, or -1 if empty

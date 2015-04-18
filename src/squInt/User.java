@@ -6,6 +6,11 @@ import java.net.InetAddress;
 /**
  * One User per host. Contains the local host's data.
  *
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
+ *
  */
 public abstract class User extends Player{
 	private int userID;
