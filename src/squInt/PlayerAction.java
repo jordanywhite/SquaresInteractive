@@ -30,6 +30,12 @@ public class PlayerAction {
 		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionNum;
 	}
 	
+	/**
+	 * converts string message to valid player action.
+	 * 
+	 * @param msg message to parse
+	 * @return parsed packet
+	 */
 	public static PlayerAction parseFromMsg(String msg) {
 		if(!isValidMessage(msg)) {
 			return null;
@@ -78,6 +84,8 @@ public class PlayerAction {
 
 		return true;
 	}
+	
+	// getter methods //
 	
 	private static int getActionNum(Action a) {
 		switch(a) {

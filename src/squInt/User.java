@@ -13,15 +13,21 @@ import java.net.InetAddress;
  *
  */
 public abstract class User extends Player{
-	private int userID;
+	private int userID; // assigned user id
 	private int[] otherUsers;
-	private Room room;
+	private Room room; // the room the user is in
 
+	/**
+	 * constructor
+	 */
 	public User(int x, int y, int direction, boolean ableToMove, int id) {		
 		super(x, y, direction, ableToMove, id);
 		this.room = new Room();
 	}
 
+	// getters and setters // 
+	
+	
 	public int getUserID() {
 		return userID;
 	}

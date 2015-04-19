@@ -2,7 +2,7 @@ package squInt;
 
 /**
  * 
- * Interacts with the server by sending move requests
+ * Interacts with the server by sending action requests
  * 
  * @author Kai Jorgensen
  * @author Bryce Matsuda
@@ -12,6 +12,9 @@ package squInt;
  */
 public class Client extends User {
 	
+	/**
+	 * constructor
+	 */
 	public Client(int x, int y, int direction, boolean ableToMove, int id) {
 		super(x,y,direction,ableToMove,id);
 	}

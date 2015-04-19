@@ -37,8 +37,6 @@ public class ClientWindow extends JPanel implements KeyListener {
 	public Player player = null;
 	public ArrayList<User> players = null;
 	
-	
-
 	/** Constructor to setup the GUI components */
 	public ClientWindow() {
 		player = new Client(0,0,Player.DOWN, true, (int)(Math.random()*50000));	
@@ -84,6 +82,12 @@ public class ClientWindow extends JPanel implements KeyListener {
 		}		
 	}
 
+	/**
+	 *  Draws player on a screen
+	 * @param tile_x the x-coordinate position
+	 * @param tile_y the y-coordinate position
+	 * @param g canvas to draw on
+	 */
 	private void drawPlayer(int tile_x, int tile_y, Graphics g) {	
 		double player_height = TILE_DIM * 0.8;
 		double player_width = player_height;
@@ -122,6 +126,8 @@ public class ClientWindow extends JPanel implements KeyListener {
 	    
 	    gg = (Graphics2D) g.create();
 	}
+	
+	// Directional methods //
 	
 	private void moveRight() {
 		player.moveRight();	

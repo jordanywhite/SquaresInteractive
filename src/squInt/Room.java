@@ -12,11 +12,16 @@ package squInt;
  *
  */
 public class Room {
+	
+	// Room dimensions
 	public static final int WIDTH = 5;
 	public static final int HEIGHT = 5;
 	
-	private RoomTile[][] tiles;
+	private RoomTile[][] tiles; // room tiles represented as 2D array
 	
+	/**
+	 * constructor
+	 */
 	public Room() {
 		tiles = new RoomTile[WIDTH][HEIGHT];
 		for(int j = 0; j < HEIGHT; j++) {

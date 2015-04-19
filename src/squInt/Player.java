@@ -17,6 +17,7 @@ import java.util.TimerTask;
  */
 public class Player {
 
+	// Directions player can move
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
 	public static final int UP = 2;
@@ -28,11 +29,14 @@ public class Player {
 	public static Color PLAYER_COLOR = Color.YELLOW;   
 	public int x; 						// the x location of the player using tile coordinates
 	public int y;						// the y location of the player using tile coordinates
-	public int direction;
-	public boolean allowedToMove;
-	public int playerID;
+	public int direction;				// direction player wants to move
+	public boolean allowedToMove;		// is player allowed to move
+	public int playerID;				// player ID
 	private Timer moveTimer = null;
 	
+	/**
+	 * constructor 
+	 */
 	public Player(int tile_x, int tile_y, int direction, boolean canIMove, int id) {
 		if (tile_x < 0 || tile_x > ClientWindow.TILES_DIM) {
 			x = 0;
@@ -64,6 +68,9 @@ public class Player {
 			}		
 		}, MOVE_DELAY);
 	}
+	
+	
+	// Directional methods //
 	
 	public void moveRight() {
 		if ( direction != Player.RIGHT ) {
