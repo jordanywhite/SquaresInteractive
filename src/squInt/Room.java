@@ -16,12 +16,15 @@ public class Room {
 		tiles = new RoomTile[WIDTH][HEIGHT];
 		for(int j = 0; j < HEIGHT; j++) {
 			for(int i = 0; i < WIDTH; i++) {
-				tiles[i][j] = new RoomTile();
+				tiles[i][j] = new RoomTile(i, j);
 			}
 		}
 	}
 	
 	public RoomTile getTileAt(int xPos, int yPos) {
+		if(xPos < 0 || xPos >= WIDTH || yPos < 0 || yPos >= HEIGHT) {
+			return null;
+		}
 		return tiles[xPos][yPos];
 	}
 

@@ -8,9 +8,9 @@ import java.net.InetAddress;
  *
  */
 public abstract class User extends Player{
-	private int userID;
-	private int[] otherUsers;
-	private Room room;
+	protected int userID;
+	protected int[] otherUsers;
+	protected Room room;
 
 	public User(int x, int y, int direction, boolean ableToMove, int id) {		
 		super(x, y, direction, ableToMove, id);

@@ -9,6 +9,7 @@ package squInt;
 public class PlayerAction {
 	public int playerId;
 	public Action action;
+	public int direction;
 	
 	public PlayerAction(int playerId, Action action) {
 		this.playerId = playerId;
