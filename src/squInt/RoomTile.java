@@ -18,6 +18,8 @@ public class RoomTile {
 		this.occupantID = -1;
 	}
 	
+	// Getters and setters //
+	
 	public int getOccupantID() { return occupantID; }
 	
 	public void setOccupantID(int userID) { occupantID = userID; }

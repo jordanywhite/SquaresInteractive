@@ -31,6 +31,13 @@ public class Room {
 		}
 	}
 	
+	/**
+	 * returns RoomTile at given x, y pos
+	 * 
+	 * @param xPos x-coordinate
+	 * @param yPos y-coordinate
+	 * @return RoomTile at given coordinates
+	 */
 	public RoomTile getTileAt(int xPos, int yPos) {
 		return tiles[xPos][yPos];
 	}

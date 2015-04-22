@@ -57,6 +57,9 @@ public class Player {
 		allowedToMove = canIMove;
 	}
 	
+	/**
+	 * creates short delay in movement
+	 */
 	public void startMoveTimer() {		
 		allowedToMove = false;
 		moveTimer = new Timer();

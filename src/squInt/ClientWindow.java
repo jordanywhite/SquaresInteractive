@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class ClientWindow extends JPanel implements KeyListener {
 
+	// Window title
 	public static final String TITLE = "...Squares Interactive GUI...";
 
 	// Name-constants (DIM stands for Dimension)
@@ -34,8 +35,8 @@ public class ClientWindow extends JPanel implements KeyListener {
 	public static final int TILES_DIM = 10;						// the number of tiles (squares) in a row or column
 	public static final int TILE_DIM = CANVAS_DIM / TILES_DIM;	// the number of pixels per tile
 	
-	public Player player = null;
-	public ArrayList<User> players = null;
+	public Player player = null; // player that will be attached to this individual GUI
+	public ArrayList<User> players = null; // list of other connected players 
 	
 	/** Constructor to setup the GUI components */
 	public ClientWindow() {
