@@ -103,6 +103,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 	HashMap<Integer, Player> players = null;
 	// The thread that waits for data from the host and processes it
 	Thread receiverThread = null;
+	String avatarName;	// Server will tell us what value this holds
 	// END TEMP CLIENT-SERVER STUFF
 
 	/** Constructor to setup the GUI components */
@@ -140,7 +141,8 @@ public class SquintGUI extends JPanel implements KeyListener {
 			initAI();
 		} else {
 			// Create a new player
-			player = createPlayer(avatars.getRandomAvatar());	
+			avatarName = "glasses";
+			player = createPlayer(avatarName);	
 		}	
 		
 		// TEMP CLIENT-SERVER STUFF
@@ -167,8 +169,8 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// END TEMP CLIENT-SERVER STUFF
 	}
 	
-	private Player createPlayer(Avatar avatar) {
-		Player player = new Player(avatar, mapSquares, Player.Move.DOWN, true, ++num_players);		
+	private Player createPlayer(String avatarName) {
+		Player player = new Player(avatarName, mapSquares, Player.Move.DOWN, true, ++num_players);		
 		// Add the player to the list of players
 		players.put(player.id, player);	
 		// Update the map to indicate the player "spawning"
@@ -189,9 +191,9 @@ public class SquintGUI extends JPanel implements KeyListener {
 		for (int ai = 0; ai < NUM_AI_PLAYERS; ai++) 
 		{				
 			// Each AI is created in a random available location with a random avatar, facing a random direction
-			Player aiPlayer = new Player(avatars.getRandomAvatar(), mapSquares, (int)(Math.random()*4), true, num_players++);
+			Player aiPlayer = new Player(avatars.getRandomAvatar().name, mapSquares, (int)(Math.random()*4), true, num_players++);
 			// If too many AI players were requested and there is no room, it will have a null avatar
-			if (aiPlayer.avatar == null) {
+			if (aiPlayer.avatarName == null) {
 				break;
 			}
 			players.put(aiPlayer.id, aiPlayer);
@@ -231,6 +233,21 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// Run GUI codes in the Event-Dispatching thread for thread safety
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				JFrame frame = new JFrame(TITLE);
+				frame.setContentPane(new SquintGUI());
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setResizable(false);
+				frame.pack();             // "this" JFrame packs its components
+				frame.setLocationRelativeTo(null); // center the application window
+				frame.setVisible(true);            // show it
+			}
+		});
+	}
+	
+	public void initGUI() {
 		// Run GUI codes in the Event-Dispatching thread for thread safety
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -615,7 +632,9 @@ public class SquintGUI extends JPanel implements KeyListener {
 			player.animatePhase++;
 		}
 		String textureName = player.direction + animationSuffix + ".png";
-		Texture t = player.avatar.getTextureWithName(textureName);
+		// Get the avatar (texture group) based on the avatar assigned to us by the server
+		Avatar avatar = avatars.getAvatar(player.avatarName);
+		Texture t = avatar.getTextureWithName(textureName);
 		if (t != null) {
 			drawImageToGrid(t.textureFile, player_x, player_y - MAP_DIM/2, g, false, true);
 		}

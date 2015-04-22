@@ -1,7 +1,8 @@
 package squInt;
 
-import java.io.*;
-import java.net.*;
+import gui_client.SquintGUI;
+
+import java.io.IOException;
 import java.util.LinkedList;
 
 /**
@@ -11,9 +12,20 @@ import java.util.LinkedList;
 public class MainClient {
 	
 	private static final String ipAddr = "localhost";
+	
+	private SquintGUI gui;
+	
 //	private static final String ipAddr = "10.12.18.33";
 	
 	public static void main(String[] args) {
+
+		// Create the main client
+		MainClient client = new MainClient();
+		
+		// Set up the GUI for the client
+		client.gui = new SquintGUI();
+		client.gui.initGUI();
+		
 		DataPort connection = null; // the client's connection to the server
 		LinkedList<String> incMsgQueue = null; // a queue containing any new messages received by the connection
 		

@@ -1,13 +1,15 @@
 package squInt;
 
+import gui_client.AvatarGroup;
+import gui_client.Map;
+import gui_client.MapEditor;
 import gui_client.MapSquare;
 import gui_client.Player;
+import gui_client.ResourceLoader;
+import gui_client.SquintGUI;
 
 import java.awt.Point;
-import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedList;
 
 /**
@@ -29,13 +31,19 @@ public class Server {
 	 */
 	private int nextId = 0;
 	
-	public static int numConnections = 5;
+	public static int totalConnections = 5;
+	
+	// Keep track of how many clients are currently connected
+	private static int currentNumConnections = 0;
 	
 	// These are references to data in the 'level' variable
 	private MapSquare[][] mapSquares = null;
 	
 	// The players connected to the server
 	private HashMap<Integer, Player> players = null;
+	
+	// The avatar names
+	private String[] avatarNames = null;
 	
 	// Holds the server connection table
 	private ServerConnectionTable serverTable = null;
@@ -50,8 +58,17 @@ public class Server {
 		/** TO RUN: run MainServer and then run MainClient numConnections times **/
 		Server server = new Server();
 
+		
 		// wait until this many connections are established
-		while(server.serverTable.getNumConnections() < numConnections) {
+		while(currentNumConnections < totalConnections) {
+			if (server.serverTable.getNumConnections() != currentNumConnections) {
+				currentNumConnections = server.serverTable.getNumConnections();
+				// A player is registered with the same ID as the connection
+				String playerInitMsg = server.registerUser();
+				// Since the player / connection ID is stored in nextId which is incremented,
+				// the id for this connection is nextId - 1;
+				server.serverTable.getConnectionByUniqueId(server.nextId-1).send(playerInitMsg);
+			}
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -80,14 +97,10 @@ public class Server {
 		}
 	}
 
-	public Server() {
-		// Init ease of access id array
-		idPos = new int[Room.WIDTH][Room.HEIGHT];
-		for (int j = 0; j < Room.HEIGHT; j++) {
-			for (int i = 0; i < Room.WIDTH; i++) {
-				idPos[i][j] = -1;
-			}
-		}
+	public Server() {		
+		// Generate (unfortunately) a lot of data but only save the meta data
+		generateMetaData();
+		
 		
 		// create the server connection and get the incoming-message queue object
 		serverTable = new ServerConnectionTable(9999); // the server's collection of DataPorts
@@ -100,6 +113,32 @@ public class Server {
 		serverTableThread.start();
 		
 		// server is now ready and listening for connections!!!
+	}
+	
+
+	
+	public String generatePlayerInitMessage(int playerId, String playerAvatarName) {				
+		return "SI#" + DataPort.INIT_MSG + "#" + playerId + "@" + playerAvatarName;
+	}
+	
+	private void generateMetaData() {
+		// Create a resource loader so we can get textures
+		ResourceLoader resLoad = new ResourceLoader();		
+		// Create the level's map editor
+		MapEditor me = new MapEditor(resLoad, SquintGUI.MAP_LEVEL, SquintGUI.CANVAS_WIDTH, SquintGUI.CANVAS_HEIGHT, SquintGUI.MAP_LAYERS, SquintGUI.MAP_DIM);
+		// Edit the level using the map editor
+		me.makeRoom(6,3,14,16,"wood_floor","walls", "shadows");
+		// Save the level's map editor as a map
+		Map level = (Map)me;
+		// Allow for easy access to the map squares
+		mapSquares = level.map.squares;
+		// Create an avatar group for the players
+		AvatarGroup avatars = new AvatarGroup(resLoad, "re");
+		avatarNames = new String[avatars.avatars.keySet().size()];
+		int idx = 0;
+		for (String avatarName : avatars.avatars.keySet()) {
+			avatarNames[idx++] = avatarName;
+		}
 	}
 
 	/**
@@ -136,16 +175,14 @@ public class Server {
 	 *            The ip address of the new client
 	 * @return the id of client assigned by the server
 	 */
-	public int registerUser() {
-		Player newPlayer = new Player(null, mapSquares, Player.Move.DOWN, true, nextId);
-		updateMap(mapSquares[newPlayer.y][newPlayer.x], nextId);
+	public String registerUser() {
 		// Increment the user id for the next user and return the id we used for
 		// this user
-		nextId++;
-		
-		// At this point we would broadcast adding the new player? TODO
-		
-		return nextId - 1;
+		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], mapSquares, Player.Move.DOWN, true, nextId++);
+		addUser(newPlayer);
+		updateMap(mapSquares[newPlayer.y][newPlayer.x], newPlayer.id);
+				
+		return generatePlayerInitMessage(newPlayer.id, newPlayer.avatarName);
 	}
 
 	/**
@@ -166,6 +203,10 @@ public class Server {
 		// At this point we would broadcast removing the player? TODO
 		
 		return true;
+	}
+	
+	public void addUser(Player player) {
+		players.put(player.id, player);
 	}
 	
 	/**
@@ -216,6 +257,8 @@ public class Server {
 		
 		int moveDirection = PlayerAction.getActionNum(playerAction.action);		
 
+
+		// TODO BROADCAST THE MOVE (DIFF) TO ALL CONNECTED CLIENTS
 		return isValidMove(moveDirection, playerId);
 	}
 
