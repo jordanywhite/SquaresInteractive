@@ -25,14 +25,14 @@ public class ClientWindow extends JPanel implements KeyListener {
 	public static final int TILES_DIM = 10;						// the number of tiles (squares) in a row or column
 	public static final int TILE_DIM = CANVAS_DIM / TILES_DIM;	// the number of pixels per tile
 	
-	public Player player = null;
+	public Player2 player = null;
 	public ArrayList<User> players = null;
 	
 	
 
 	/** Constructor to setup the GUI components */
 	public ClientWindow() {
-		player = new Client(0,0,Player.DOWN, true, (int)(Math.random()*50000));	
+		player = new Client(0,0,Player2.DOWN, true, (int)(Math.random()*50000));	
 		players = new ArrayList<User>();
 		players.add((User)player);
 		
@@ -54,7 +54,7 @@ public class ClientWindow extends JPanel implements KeyListener {
 //		drawPlayer(player.x, player.y, g2d);	// Draw the player
 		
 		// Draw everyone connected to the server
-		for(Player p : players) {
+		for(Player2 p : players) {
 			drawPlayer(p.x, p.y, g2d);	// Draw the player
 		}
 	}
@@ -96,7 +96,7 @@ public class ClientWindow extends JPanel implements KeyListener {
 	    gg.rotate(Math.toRadians(90 * player.direction), TILE_DIM/2, TILE_DIM/2);
 
 	    
-		gg.setColor(Player.PLAYER_COLOR);
+		gg.setColor(Player2.PLAYER_COLOR);
 		gg.fillArc((int)player_x_offset, (int)player_y_offset, (int)player_height, (int)player_width, 0, 360);
 		gg.setColor(Color.BLACK);
 

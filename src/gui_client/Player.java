@@ -47,7 +47,7 @@ public class Player {
 	// Resources
 	public ResourceLoader resources = null;
 	
-	public Player(Avatar avatar, MapSquare[][] sq, int direction, boolean canIMove, int playerIdx) {	
+	public Player(Avatar avatar, MapSquare[][] sq, int direction, boolean canIMove, int playerIdx) {
 		// Pick a pseudorandom location to place the player based on the given map
 		Integer[] numRows = new Integer[sq.length];
 		for (int i = 0; i < numRows.length; i++) {

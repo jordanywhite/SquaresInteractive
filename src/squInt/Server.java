@@ -1,28 +1,23 @@
 package squInt;
 
+import gui_client.MapSquare;
+import gui_client.Player;
+
 import java.awt.Point;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedList;
 
 /**
  * The User object for the server.
  *
  */
-public class Server extends User {
+public class Server {
 
 	public static final int MAX_CLIENTS = 32;
 	public static final int SERVER_ID = 0;
-	/*
-	 * Hash table with User ids connected to ip addresses for interesting
-	 * information
-	 */
-	private Hashtable<Integer, InetAddress> myIpLookup;
-
-	/*
-	 * The unique ids assigned to every client by the server
-	 */
-	private ArrayList<Integer> userIds;
 
 	/*
 	 * Convenient way to know where everyone is for the server
@@ -32,16 +27,60 @@ public class Server extends User {
 	/*
 	 * The id to be assigned to the next client
 	 */
-	private int nextId;
+	private int nextId = 0;
+	
+	public static int numConnections = 5;
+	
+	// These are references to data in the 'level' variable
+	private MapSquare[][] mapSquares = null;
+	
+	// The players connected to the server
+	private HashMap<Integer, Player> players = null;
+	
+	// Holds the server connection table
+	private ServerConnectionTable serverTable = null;
+	
+	// holds the incoming message queue
+	private LinkedList<ServerQueuedMessage> serverQueue = null;
+	
+	// The thread that listens for incoming connections to the server
+	private Thread serverTableThread;
+	
+	public static void main(String[] args) {
+		/** TO RUN: run MainServer and then run MainClient numConnections times **/
+		Server server = new Server();
+
+		// wait until this many connections are established
+		while(server.serverTable.getNumConnections() < numConnections) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// send message to all
+		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
+		server.serverTable.sendToAll("Snotty trails?");
+		
+		// now have server just wait for inc messages and print them (until program is terminated)
+		while(true) {
+			if(server.serverQueue.peek() != null) {
+				// ServerQueuedMessage object just contains the source DataPort and the received String
+				ServerQueuedMessage sqm = server.serverQueue.poll();
+				System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
+			}
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	}
 
 	public Server() {
-		// Make a user with all the bells and whistles
-		super(0, 0, Player.DOWN, true, SERVER_ID);
-		nextId = 1;
-
-		// Make this server a proper user with an id and ip
-		userIds.add(SERVER_ID);
-
 		// Init ease of access id array
 		idPos = new int[Room.WIDTH][Room.HEIGHT];
 		for (int j = 0; j < Room.HEIGHT; j++) {
@@ -49,11 +88,18 @@ public class Server extends User {
 				idPos[i][j] = -1;
 			}
 		}
-		idPos[0][0] = SERVER_ID;
-		room.getTileAt(0, 0).setOccupantID(SERVER_ID);
+		
+		// create the server connection and get the incoming-message queue object
+		serverTable = new ServerConnectionTable(9999); // the server's collection of DataPorts
+		serverQueue = serverTable.getIncMessageQueue(); // the server's master incoming message queue (from all sources).
+		// (ServerQueuedMessage is just a tuple of the source DataPort
+		//  and message String so we can know the source)
 
-		myIpLookup = new Hashtable<Integer, InetAddress>();
-		myIpLookup.put(SERVER_ID, this.getIp());
+		// start the connection server
+		serverTableThread = new Thread(serverTable);
+		serverTableThread.start();
+		
+		// server is now ready and listening for connections!!!
 	}
 
 	/**
@@ -75,63 +121,11 @@ public class Server extends User {
 	}
 
 	/**
-	 * changePlayerPos move the players effective location to designated spot
-	 * 
-	 * @param id
-	 *            client to be moved
-	 * @param toX
-	 *            x pos to move to
-	 * @param toY
-	 *            y pos to move to
-	 * @return true if successfully moved, false otherwise
-	 */
-	public boolean changePlayerPos(int id, int toX, int toY) {
-		Point p = getPlayerPos(id);
-		if (p == null) {
-			return false;
-		}
-
-		int x = (int) p.getX();
-		int y = (int) p.getY();
-		if (!inRoom(x, y) || !inRoom(toX, toY)) {
-			return false;
-		}
-		if (idPos[toX][toY] == -1) {
-			idPos[x][y] = -1;
-			idPos[toX][toY] = id;
-			room.getTileAt(x, y).setOccupantID(-1);
-			room.getTileAt(toX, toY).setOccupantID(id);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * inRoom is this point in the room
-	 * 
-	 * @param x
-	 *            x position
-	 * @param y
-	 *            y position
-	 * @return true if in the room, false otherwise
-	 */
-	public boolean inRoom(int x, int y) {
-		return (x >= 0 && x < Room.WIDTH) && (y >= 0 && y < Room.HEIGHT);
-	}
-
-	/**
-	 * getMasterRoom The one room to rule them all
+	 * getMapSquares The one map to rule them all
 	 * 
 	 */
-	public Room getMasterRoom() {
-		return this.getRoom();
-	}
-
-	/**
-	 * getClientIpAddress
-	 */
-	public InetAddress getClientIpAddress(int id) {
-		return myIpLookup.get(id);
+	public MapSquare[][] getMapSquares() {
+		return this.mapSquares;
 	}
 
 	/**
@@ -142,31 +136,15 @@ public class Server extends User {
 	 *            The ip address of the new client
 	 * @return the id of client assigned by the server
 	 */
-	public int registerUser(InetAddress addr) {
-		if (addr == null) {
-			System.out.println("ERROR: Null IP address");
-			return -1;
-		}
-		myIpLookup.put(nextId, addr);
-
-		int x = 0;
-		int y = 0;
-
-		// Give our new user a tile to start at
-		while (true) {
-			x = (int) (Math.random() * (Room.WIDTH + 1));
-			y = (int) (Math.random() * (Room.HEIGHT + 1));
-			if (idPos[x][y] == -1) {
-				idPos[x][y] = nextId;
-				room.getTileAt(x, y).setOccupantID(nextId);
-				userIds.add(nextId);
-				break;
-			}
-		}
-
+	public int registerUser() {
+		Player newPlayer = new Player(null, mapSquares, Player.Move.DOWN, true, nextId);
+		updateMap(mapSquares[newPlayer.y][newPlayer.x], nextId);
 		// Increment the user id for the next user and return the id we used for
 		// this user
 		nextId++;
+		
+		// At this point we would broadcast adding the new player? TODO
+		
 		return nextId - 1;
 	}
 
@@ -178,16 +156,30 @@ public class Server extends User {
 	 * @retun true if the removal was successful, false otherwise
 	 */
 	public boolean removeUser(int id) {
-		Point hereIAm = getPlayerPos(id);
-		if (hereIAm != null) {
-			room.getTileAt(hereIAm.x, hereIAm.y).setOccupantID(-1);
-			myIpLookup.remove(id);
-			idPos[hereIAm.y][hereIAm.y] = -1;
-			userIds.remove(id);
-			return true;
-		} else {
+		if (!players.containsKey(id)) {
 			return false;
 		}
+		Player removeThisGuy = players.get(id);
+		changeMapOccupation(removeThisGuy.x, removeThisGuy.y, -1, false);
+		players.remove(id);
+		
+		// At this point we would broadcast removing the player? TODO
+		
+		return true;
+	}
+	
+	/**
+	 * Update a map square to indicate whether it contains a player and if so
+	 * what is the player's ID
+	 * 
+	 * @param playerX
+	 * @param playerY
+	 * @param playerID
+	 * @param occupied
+	 */
+	public void changeMapOccupation(int playerX, int playerY, int playerID, Boolean occupied) {
+		mapSquares[playerY][playerX].isOccupied = occupied;
+		mapSquares[playerY][playerX].playerId = occupied ? playerID : -1;
 	}
 
 	/**
@@ -203,61 +195,96 @@ public class Server extends User {
 
 	/**
 	 * requestAction Judge the worth of an action
+	 * 
+	 * THE CALLER MUST BROADCAST A VALID MOVE TO CLIENTS TODO
 	 *
-	 * @param action
+	 * @param playerAction
 	 *            on which we shall act on
 	 * @return true if the action is worthy, false if the action is found
 	 *         wanting
 	 */
-	public boolean requestAction(PlayerAction action) {
+	public boolean requestAction(PlayerAction playerAction) {
 
-		if (action == null) {
+		if (playerAction == null) {
 			return false;
 		}
 
-		int playerId = action.playerId;
-		int x = (int) getPlayerPos(playerId).getX();
-		int y = (int) getPlayerPos(playerId).getY();
-		if (!inRoom(x, y)) {
+		int playerId = playerAction.playerId;
+		if (!players.containsKey(playerId)) {
 			return false;
 		}
+		
+		int moveDirection = PlayerAction.getActionNum(playerAction.action);		
 
-		//TODO: The action also needs the current direction of the client
-		switch (action.action) {
-		case MOVE_UP: {
-			return moveTo(playerId, x, y, 0, -1);
-		}
-		case MOVE_DOWN: {
-			return moveTo(playerId, x, y, 0, 1);
-		}
-		case MOVE_LEFT: {
-			return moveTo(playerId, x, y, -1, 0);
-		}
-		case MOVE_RIGHT: {
-			return moveTo(playerId, x, y, 1, 0);
-		}
-		case INTERACT:
-			// TODO
-			break;
-		default:
-			System.out.println("Invalid action: should be impossible but apparently not.");
-			return false;
-		}
+		return isValidMove(moveDirection, playerId);
+	}
 
+	/**
+	 * Determines if a move is valid based on the player's location and
+	 * the direction that the player is trying to move
+	 * 
+	 * Updates the map if the move was valid
+	 * 
+	 * @param moveDirection	The direction the player is trying to move
+	 * @param playerId		The player that is trying to move
+	 * @return	Whether or not the proposed move is valid
+	 */
+	public boolean isValidMove(int moveDirection, int playerId) {
+		// Check if the player is simply rotating in place
+		if (moveDirection != players.get(playerId).direction) {
+			// Player is rotating in place, they can do that all they want
+			return true;
+		}
+		// Get the coordinates of the destination square based on the move direction
+		Point destSquarePoint = getNewPlayerPosition(players.get(playerId), moveDirection);
+		// Get the destination square based on the move direction
+		MapSquare destSquare = mapSquares[destSquarePoint.y][destSquarePoint.x];
+		// Check if the destination square is occupied or SOLID
+		if (!destSquare.isOccupied && !destSquare.sqType.equals(MapSquare.SquareType.SOLID)) {
+			// Update the map to indicate the new location
+			updateMap(destSquare, playerId);
+			// Square is available to be moved into, let the player know they can move
+			return true;
+		}
 		return false;
 	}
 	
 	/**
-	 * moveTo pointless method that moves things in a more understandable way
+	 * Update the map to indicate that a player has moved
+	 * 	Reset their previous square
+	 * 	Set their new square
 	 * 
-	 * @param id client id to be moved
-	 * @param x client x position
-	 * @param y client y position
-	 * @param xOffset move this far horizontally
-	 * @param yOffset move this far vertically
-	 * @return true is successfully moved, false otherwise
+	 * @param destSquare	The square that the player moved to
+	 * @param playerId		The ID of the player that moved
 	 */
-	private boolean moveTo(int id, int x, int y, int xOffset, int yOffset) {
-		return changePlayerPos(id, x + xOffset, y + yOffset);
+	private void updateMap(MapSquare destSquare, int playerId) {
+		// First get the old map square and clear it
+		Player player = players.get(playerId);
+		MapSquare oldSquare = mapSquares[player.y][player.x];
+		// Reset the old square
+		oldSquare.isOccupied = false;
+		oldSquare.playerId = -1;
+		// Set the new square
+		destSquare.playerId = playerId;
+		destSquare.isOccupied = true;
+	}
+	
+	/**
+	 * Figure out where the player would end up if they moved in
+	 * a direction
+	 * 
+	 * @param player
+	 * @param direction
+	 * @return
+	 */
+	private Point getNewPlayerPosition(Player player, int direction){
+		Point newPoint = new Point(player.x, player.y);
+		switch(direction) {
+			case Player.Move.RIGHT: newPoint.x++;	break;
+			case Player.Move.UP:	newPoint.y--;	break;
+			case Player.Move.LEFT:	newPoint.x--;	break;
+			case Player.Move.DOWN:	newPoint.y++;	break;
+		}
+		return newPoint;
 	}
 }

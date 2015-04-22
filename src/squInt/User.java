@@ -7,7 +7,7 @@ import java.net.InetAddress;
  * One User per host. Contains the local host's data.
  *
  */
-public abstract class User extends Player{
+public abstract class User extends Player2{
 	protected int userID;
 	protected int[] otherUsers;
 	protected Room room;
