@@ -13,9 +13,10 @@ import java.net.InetAddress;
  *
  */
 public abstract class User extends Player{
-	private int userID; // assigned user id
-	private int[] otherUsers;
-	private Room room; // the room the user is in
+
+	protected int userID; // assigned user id
+	protected int[] otherUsers; // the room the user is in
+	protected Room room;
 
 	/**
 	 * constructor
