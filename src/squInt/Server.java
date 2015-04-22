@@ -139,6 +139,7 @@ public class Server {
 		for (String avatarName : avatars.avatars.keySet()) {
 			avatarNames[idx++] = avatarName;
 		}
+		players = new HashMap<Integer, Player>();
 	}
 
 	/**
@@ -179,6 +180,10 @@ public class Server {
 		// Increment the user id for the next user and return the id we used for
 		// this user
 		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], mapSquares, Player.Move.DOWN, true, nextId++);
+		if (newPlayer == null) {
+			// failed to create user?
+			return null;
+		}
 		addUser(newPlayer);
 		updateMap(mapSquares[newPlayer.y][newPlayer.x], newPlayer.id);
 				

@@ -78,7 +78,8 @@ public class Player {
 			return;
 		}
 
-		if (direction < Move.RIGHT || direction > Move.DOWN) {
+		// If the direction was incorrect, set it to be a default DOWN direction
+		if (direction > Move.RIGHT || direction < Move.DOWN) {
 			this.direction = Move.DOWN;
 		} else {
 			this.direction = direction;			
