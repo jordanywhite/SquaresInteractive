@@ -14,8 +14,8 @@ package squInt;
 public class PlayerAction {
 	public int playerId;
 	public Action action;
-	public int direction;
 	
+//	public int direction;
 	public PlayerAction(int playerId, Action action) {
 		this.playerId = playerId;
 		this.action = action;
@@ -88,13 +88,13 @@ public class PlayerAction {
 	
 	// getter methods //
 	
-	private static int getActionNum(Action a) {
+	public static int getActionNum(Action a) {
 		switch(a) {
-		case MOVE_UP:
-			return 0;
 		case MOVE_DOWN:
-			return 1;
+			return 0;
 		case MOVE_LEFT:
+			return 1;
+		case MOVE_UP:
 			return 2;
 		case MOVE_RIGHT:
 			return 3;
@@ -105,14 +105,14 @@ public class PlayerAction {
 		}
 	}
 	
-	private static Action getActionFromInt(int i) {
+	public static Action getActionFromInt(int i) {
 		switch(i) {
 		case 0:
-			return Action.MOVE_UP;
-		case 1:
 			return Action.MOVE_DOWN;
-		case 2:
+		case 1:
 			return Action.MOVE_LEFT;
+		case 2:
+			return Action.MOVE_UP;
 		case 3:
 			return Action.MOVE_RIGHT;
 		case 4:

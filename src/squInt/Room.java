@@ -1,5 +1,7 @@
 package squInt;
 
+import gui_client.SquintGUI;
+
 /**
  * A room that can have players in it.
  * 
@@ -14,9 +16,9 @@ package squInt;
 public class Room {
 	
 	// Room dimensions
-	public static final int WIDTH = 5;
-	public static final int HEIGHT = 5;
-	
+	public static final int WIDTH = SquintGUI.CANVAS_WIDTH / SquintGUI.MAP_DIM;
+	public static final int HEIGHT = SquintGUI.CANVAS_HEIGHT / SquintGUI.MAP_DIM;
+
 	private RoomTile[][] tiles; // room tiles represented as 2D array
 	
 	/**

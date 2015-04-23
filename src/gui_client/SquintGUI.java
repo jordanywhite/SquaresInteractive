@@ -43,7 +43,7 @@ import javax.swing.SwingUtilities;
  * @author Caleb Piekstra
  *
  */
-public class SquintMainWindow extends JPanel implements KeyListener {
+public class SquintGUI extends JPanel implements KeyListener {
 
 	// Cereal Identification (not frosted flakes)
 	private static final long serialVersionUID = -8781116976800446850L;
@@ -103,10 +103,11 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 	HashMap<Integer, Player> players = null;
 	// The thread that waits for data from the host and processes it
 	Thread receiverThread = null;
+	String avatarName;	// Server will tell us what value this holds
 	// END TEMP CLIENT-SERVER STUFF
 
 	/** Constructor to setup the GUI components */
-	public SquintMainWindow() 
+	public SquintGUI() 
 	{				
 		// Create a resource loader so we can get textures
 		resLoad = new ResourceLoader();		
@@ -134,49 +135,65 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 		// Set up the hashtable of players
 		players = new HashMap<Integer, Player>();
 
-        // Determine what mode to start the client in
-		if (AI_MODE) {
-			// Set up the AI players and lock out user input
-			initAI();
-		} else {
-			// Create a new player
-			player = createPlayer(avatars.getAvatar("glasses"));	
-		}	
+//        // Determine what mode to start the client in
+//		if (AI_MODE) {
+//			// Set up the AI players and lock out user input
+//			initAI();
+//		} else {
+//			// Create a new player
+//			avatarName = "glasses";
+//			player = createPlayer(avatarName);	
+//		}	
 		
 		// TEMP CLIENT-SERVER STUFF
 		// Create a copy of the map squares 
-		MapSquare[][] squares = new MapSquare[mapSquares.length][mapSquares[0].length];
-		for (int row = 0; row < mapSquares.length; row++) {
-			for (int col = 0; col < mapSquares[row].length; col++) {
-				MapSquare original = mapSquares[row][col];
-				squares[row][col] = new MapSquare(original.sqType, original.isOccupied, original.playerId, row, col);
-			}
-		}
-		Player[] playersArr = new Player[players.size()];
-		int playerIdx = 0;
-	    Iterator<Player> playerIterator = players.values().iterator();
-	    while (playerIterator.hasNext()) {
-	    	playersArr[playerIdx++] = playerIterator.next();
-	    }	
+//		MapSquare[][] squares = new MapSquare[mapSquares.length][mapSquares[0].length];
+//		for (int row = 0; row < mapSquares.length; row++) {
+//			for (int col = 0; col < mapSquares[row].length; col++) {
+//				MapSquare original = mapSquares[row][col];
+//				squares[row][col] = new MapSquare(original.sqType, original.isOccupied, original.playerId, row, col);
+//			}
+//		}
+//		Player[] playersArr = new Player[players.size()];
+//		int playerIdx = 0;
+//	    Iterator<Player> playerIterator = players.values().iterator();
+//	    while (playerIterator.hasNext()) {
+//	    	playersArr[playerIdx++] = playerIterator.next();
+//	    }	
 		// Init the server "host" with our copy of the map and an array of the players in the map
-		host = new PretendServer(squares, playersArr);
+//		host = new PretendServer(squares, playersArr);
 		// Create a receiver thread that waits for data from the host
-		receiverThread = new Thread(new Receiver());
+//		receiverThread = new Thread(new Receiver());
 		// Start the receiver
-		receiverThread.start();
+//		receiverThread.start();
 		// END TEMP CLIENT-SERVER STUFF
 	}
 	
-	private Player createPlayer(Avatar avatar) {
-		Player player = new Player(avatar, mapSquares, Player.Move.DOWN, true, ++num_players);		
-		// Add the player to the list of players
-		players.put(player.id, player);	
+	/**
+	 * This will be called when we receive an INIT_MSG from the server telling us
+	 * what our player ID is and what avatar to use
+	 * 
+	 * @param avatarName
+	 * @return
+	 */
+	public Player createPlayer(int playerId, String avatarName) {
+		if (playerId > num_players) {
+			num_players = playerId;
+		}
+		player = new Player(avatarName, mapSquares, Player.Move.DOWN, true, playerId);		
+//		// Add the player to the list of players
+//		players.put(player.id, player);	
 		// Update the map to indicate the player "spawning"
 		changeMapOccupation(player.x, player.y, player.id, true);
 		// Return a reference to the player if needed
 		return player;
 	}
 	
+	/**
+	 * This sets up the room so we can draw it
+	 * 
+	 * @param level
+	 */
 	private void editLevel(MapEditor level) {
 		// This is the prototype ROOM level
 		level.makeRoom(6,3,14,16,"wood_floor","walls", "shadows");
@@ -184,46 +201,46 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 //		level.makeOutside(0,0,19,19, "grass","water",TERRAIN_ANIMATION_DELAY, "", "", new TerrainAnimator());
 	}
 	
-	private void initAI() {
-		// Go through and create the specified number of players
-		for (int ai = 0; ai < NUM_AI_PLAYERS; ai++) 
-		{				
-			// Each AI is created in a random available location with a random avatar, facing a random direction
-			Player aiPlayer = new Player(avatars.getRandomAvatar(), mapSquares, (int)(Math.random()*4), true, num_players++);
-			// If too many AI players were requested and there is no room, it will have a null avatar
-			if (aiPlayer.avatar == null) {
-				break;
-			}
-			players.put(aiPlayer.id, aiPlayer);
-			changeMapOccupation(aiPlayer.x, aiPlayer.y, aiPlayer.id, true);					
-		}
-		// Configure a timer to automatically move the AI players
-		Timer autoMoveTimer = new Timer();
-		autoMoveTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				// Go through all ai players and make them move in a random direction
-			    Iterator<Player> playerIterator = players.values().iterator();
-			    while (playerIterator.hasNext()) {
-			    	Player player = playerIterator.next();
-			    	int moveDirection = (int)(Math.random()*4);
-					if (player.allowedToMove) {
-				        // Check if we are allowed to move
-			        	if (host.lookIPressedSomethingCanIMove(moveDirection, player.id)) {
-			        		// Let's move!
-			        		// Simulate data being received from the host
-			        		try {
-								receivedDataBuffer.put(new Packet(moveDirection, player.id, Packet.PLAYER_DATA_FLAG));
-							} catch (InterruptedException e1) {
-								System.out.println("Couldn't simulate getting data from host");
-							}
-			    	        repaint();        		
-			        	}
-					}
-			    }			
-			}		
-		}, 2000, AI_MOVE_DELAY);
-	}
+//	private void initAI() {
+//		// Go through and create the specified number of players
+//		for (int ai = 0; ai < NUM_AI_PLAYERS; ai++) 
+//		{				
+//			// Each AI is created in a random available location with a random avatar, facing a random direction
+//			Player aiPlayer = new Player(avatars.getRandomAvatar().name, mapSquares, (int)(Math.random()*4), true, num_players++);
+//			// If too many AI players were requested and there is no room, it will have a null avatar
+//			if (aiPlayer.avatarName == null) {
+//				break;
+//			}
+//			players.put(aiPlayer.id, aiPlayer);
+//			changeMapOccupation(aiPlayer.x, aiPlayer.y, aiPlayer.id, true);					
+//		}
+//		// Configure a timer to automatically move the AI players
+//		Timer autoMoveTimer = new Timer();
+//		autoMoveTimer.scheduleAtFixedRate(new TimerTask() {
+//			@Override
+//			public void run() {
+//				// Go through all ai players and make them move in a random direction
+//			    Iterator<Player> playerIterator = players.values().iterator();
+//			    while (playerIterator.hasNext()) {
+//			    	Player player = playerIterator.next();
+//			    	int moveDirection = (int)(Math.random()*4);
+//					if (player.allowedToMove) {
+//				        // Check if we are allowed to move
+//			        	if (host.lookIPressedSomethingCanIMove(moveDirection, player.id)) {
+//			        		// Let's move!
+//			        		// Simulate data being received from the host
+//			        		try {
+//								receivedDataBuffer.put(new Packet(moveDirection, player.id, Packet.PLAYER_DATA_FLAG));
+//							} catch (InterruptedException e1) {
+//								System.out.println("Couldn't simulate getting data from host");
+//							}
+//			    	        repaint();        		
+//			        	}
+//					}
+//			    }			
+//			}		
+//		}, 2000, AI_MOVE_DELAY);
+//	}
 
 	/**
 	 * Set up the client window
@@ -231,11 +248,15 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		new SquintGUI().initGUI();
+	}
+	
+	public void initGUI() {
 		// Run GUI codes in the Event-Dispatching thread for thread safety
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame frame = new JFrame(TITLE);
-				frame.setContentPane(new SquintMainWindow());
+				frame.setContentPane(new SquintGUI());
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setResizable(false);
 				frame.pack();             // "this" JFrame packs its components
@@ -253,56 +274,56 @@ public class SquintMainWindow extends JPanel implements KeyListener {
    \  \___________________________________________________________________________________________
 	\**                                                                                           **/	
 	
-	// TEMP CLIENT-SERVER STUFF
-	public final class Packet {
-		public final int moveDirection;
-		public final int playerId;
-		public final int flags;
-		
-		public static final int PLAYER_DATA_FLAG = 0x01;
-		
-		public Packet(int direction, int playerId, int flags) {
-			this.flags = flags;
-			moveDirection = direction;
-			this.playerId = playerId;			
-		}
-	}	
-	public BlockingQueue<Packet> receivedDataBuffer = new ArrayBlockingQueue<Packet>(100);	
-	public class Receiver implements Runnable {
-		
-		public final int POLL_TIMEOUT = 60;
-		
-		public Receiver() {	
-			
-		}
-		
-		@Override
-		public void run() {
-			while (true) {				
-				System.out.println("WAIT: Waiting for data from the host...");
-				Packet data = null;
-				try {
-					// Sit here and wait for data for at most POLL_TIMEOUT time
-					data = receivedDataBuffer.poll(POLL_TIMEOUT, TimeUnit.MINUTES);
-				} catch (InterruptedException e) {
-					System.out.println("Error in receive buffer");
-//					e.printStackTrace();
-				}
-				// If there is no data, try again
-				if (data == null) {
-					System.out.println("TIMEOUT: Did not receive any data in " + POLL_TIMEOUT + " minutes. Closing connection.");
-					// not really closing the connection, but kill the receiver
-					return;
-				}
-				System.out.println("SUCCESS: Data received!");
-				// If we have movement data, it's time to move
-				if ((data.flags & Packet.PLAYER_DATA_FLAG) == Packet.PLAYER_DATA_FLAG) {
-					movePlayer(data.moveDirection, players.get(data.playerId));				
-				}
-			}
-		}		
-	}
-	// END TEMP CLIENT-SERVER STUFF
+//	// TEMP CLIENT-SERVER STUFF
+//	public final class Packet {
+//		public final int moveDirection;
+//		public final int playerId;
+//		public final int flags;
+//		
+//		public static final int PLAYER_DATA_FLAG = 0x01;
+//		
+//		public Packet(int direction, int playerId, int flags) {
+//			this.flags = flags;
+//			moveDirection = direction;
+//			this.playerId = playerId;			
+//		}
+//	}	
+//	public BlockingQueue<Packet> receivedDataBuffer = new ArrayBlockingQueue<Packet>(100);	
+//	public class Receiver implements Runnable {
+//		
+//		public final int POLL_TIMEOUT = 60;
+//		
+//		public Receiver() {	
+//			
+//		}
+//		
+//		@Override
+//		public void run() {
+//			while (true) {				
+//				System.out.println("WAIT: Waiting for data from the host...");
+//				Packet data = null;
+//				try {
+//					// Sit here and wait for data for at most POLL_TIMEOUT time
+//					data = receivedDataBuffer.poll(POLL_TIMEOUT, TimeUnit.MINUTES);
+//				} catch (InterruptedException e) {
+//					System.out.println("Error in receive buffer");
+////					e.printStackTrace();
+//				}
+//				// If there is no data, try again
+//				if (data == null) {
+//					System.out.println("TIMEOUT: Did not receive any data in " + POLL_TIMEOUT + " minutes. Closing connection.");
+//					// not really closing the connection, but kill the receiver
+//					return;
+//				}
+//				System.out.println("SUCCESS: Data received!");
+//				// If we have movement data, it's time to move
+//				if ((data.flags & Packet.PLAYER_DATA_FLAG) == Packet.PLAYER_DATA_FLAG) {
+//					movePlayer(data.moveDirection, players.get(data.playerId));				
+//				}
+//			}
+//		}		
+//	}
+//	// END TEMP CLIENT-SERVER STUFF
 	
 	/**
 	 * Handles player movement upon keyboard input
@@ -355,6 +376,7 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 	public void changeMapOccupation(int playerX, int playerY, int playerID, Boolean occupied) {
 		mapSquares[playerY][playerX].isOccupied = occupied;
 		mapSquares[playerY][playerX].playerId = occupied ? playerID : -1;
+		repaint();	// Update the GUI
 	}
 	
 	/**
@@ -615,7 +637,9 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 			player.animatePhase++;
 		}
 		String textureName = player.direction + animationSuffix + ".png";
-		Texture t = player.avatar.getTextureWithName(textureName);
+		// Get the avatar (texture group) based on the avatar assigned to us by the server
+		Avatar avatar = avatars.getAvatar(player.avatarName);
+		Texture t = avatar.getTextureWithName(textureName);
 		if (t != null) {
 			drawImageToGrid(t.textureFile, player_x, player_y - MAP_DIM/2, g, false, true);
 		}
@@ -707,17 +731,22 @@ public class SquintMainWindow extends JPanel implements KeyListener {
 	        } else if(heldKeys.contains(KeyEvent.VK_E)) {
 	        	moveDirection = (player.direction + 1) % (Player.Move.RIGHT + 1);
 	        }
-	        // Check if we are allowed to move
-        	if (moveDirection != -1 && host.lookIPressedSomethingCanIMove(moveDirection, player.id)) {
-        		// Simulate move data being received from the host
-        		try {
-					receivedDataBuffer.put(new Packet(moveDirection, player.id, Packet.PLAYER_DATA_FLAG));
-				} catch (InterruptedException e1) {
-					System.out.println("Couldn't simulate getting data from host");
-				}
-        		// Update our GUI
-    	        repaint();        		
-        	}
+	        
+	        
+	        // TODO this is where we send a move request to the server that includes our player.id and the moveDirection
+	        
+	        
+//	        // Check if we are allowed to move
+//        	if (moveDirection != -1 && host.lookIPressedSomethingCanIMove(moveDirection, player.id)) {
+//        		// Simulate move data being received from the host
+//        		try {
+//					receivedDataBuffer.put(new Packet(moveDirection, player.id, Packet.PLAYER_DATA_FLAG));
+//				} catch (InterruptedException e1) {
+//					System.out.println("Couldn't simulate getting data from host");
+//				}
+//        		// Update our GUI
+//    	        repaint();        		
+//        	}
 		}
 	}
 

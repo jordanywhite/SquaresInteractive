@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<root path="C:\Users\piekstra17\Documents\GitHub\Squares-Interactive-GUI\res\images">
+<root path="C:\Users\build\Desktop\SquaresInteractive-master\res\images">
     <dir name="avatars">
         <dir name="re">
             <dir name="blond">
@@ -305,20 +305,23 @@
             <file>0.png</file>
             <file>1.png</file>
             <file>10.png</file>
-            <file>11.png</file>
             <file>12.png</file>
-            <file>13.png</file>
-            <file>14.png</file>
-            <file>15.png</file>
-            <file>16.png</file>
-            <file>2.png</file>
-            <file>3.png</file>
-            <file>4.png</file>
-            <file>5.png</file>
-            <file>6.png</file>
-            <file>7.png</file>
-            <file>8.png</file>
-            <file>9.png</file>
+            <file>17.png</file>
+            <file>18.png</file>
+            <file>19.png</file>
+            <file>20.png</file>
+            <file>21.png</file>
+            <file>22.png</file>
+            <file>23.png</file>
+            <file>component-1-1.png</file>
+            <file>component-1-2.png</file>
+            <file>component-1-3.png</file>
+            <file>component-2-1.png</file>
+            <file>component-2-2.png</file>
+            <file>component-2-3.png</file>
+            <file>component-3-1.png</file>
+            <file>component-3-2.png</file>
+            <file>component-3-3.png</file>
         </dir>
         <dir name="walls">
             <file>bottom-1.png</file>
@@ -502,11 +505,11 @@
             <file>component-1-1.png</file>
             <file>component-1-2.png</file>
             <file>component-1-3.png</file>
+            <file>component-2-1.png</file>
             <file>component-2-2.png</file>
+            <file>component-2-3.png</file>
             <file>component-3-2.png</file>
-            <file>component-4-1.png</file>
             <file>component-4-2.png</file>
-            <file>component-4-3.png</file>
         </dir>
         <dir name="house_2">
             <file>0 (2).png</file>
@@ -598,7 +601,6 @@
             <file>5.png</file>
             <file>6.png</file>
         </dir>
-        <dir name="temp"/>
         <dir name="town_shadow">
             <file>0.png</file>
             <file>1.png</file>

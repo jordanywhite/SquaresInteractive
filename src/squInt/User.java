@@ -12,8 +12,8 @@ import java.net.InetAddress;
  * @author Jordan White
  *
  */
-public abstract class User extends Player{
 
+public abstract class User extends Player2{
 	protected int userID; // assigned user id
 	protected int[] otherUsers; // the room the user is in
 	protected Room room;

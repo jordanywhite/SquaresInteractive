@@ -42,12 +42,12 @@ public class Player {
 	public boolean isJumping;
 	
 	// Holds the textures for the player 
-	public Avatar avatar = null;
+	public String avatarName = null;
 		
 	// Resources
 	public ResourceLoader resources = null;
 	
-	public Player(Avatar avatar, MapSquare[][] sq, int direction, boolean canIMove, int playerIdx) {	
+	public Player(String avatarName, MapSquare[][] sq, int direction, boolean canIMove, int playerIdx) {
 		// Pick a pseudorandom location to place the player based on the given map
 		Integer[] numRows = new Integer[sq.length];
 		for (int i = 0; i < numRows.length; i++) {
@@ -78,7 +78,8 @@ public class Player {
 			return;
 		}
 
-		if (direction < Move.RIGHT || direction > Move.DOWN) {
+		// If the direction was incorrect, set it to be a default DOWN direction
+		if (direction > Move.RIGHT || direction < Move.DOWN) {
 			this.direction = Move.DOWN;
 		} else {
 			this.direction = direction;			
@@ -90,7 +91,7 @@ public class Player {
 		inAnimationPhase = false;
 		isJumping = false;
 		// Set the avatar last, if we couldn't create a player then it will have a null avatar
-		this.avatar = avatar;
+		this.avatarName = avatarName;
 	}
 	
 	public void startMoveTimer() {		
