@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 /**
  * 
+ * AvatarGroup - group of avatars
  * 
  * @author Caleb Piekstra
  *

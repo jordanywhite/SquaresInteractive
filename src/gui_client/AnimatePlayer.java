@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * 
+ * Animates player movement
  * 
  * @author Caleb Piekstra
  *

@@ -12,14 +12,27 @@ package squInt;
  *
  */
 public class PlayerAction {
-	public int playerId;
+	public int playerId; 
 	public Action action;
 	
+	/** 
+	 * constructor
+	 * 
+	 * @param playerId player producing action
+	 * @param action direction player is moving
+	 */
 	public PlayerAction(int playerId, Action action) {
 		this.playerId = playerId;
 		this.action = action;
 	}
 	
+	/**
+	 * generateActionMessage - creates server message
+	 *  
+	 * @param playerId
+	 * @param actionInt
+	 * @return message
+	 */
 	public static String generateActionMessage(int playerId, int actionInt) {
 		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionInt;
 	}

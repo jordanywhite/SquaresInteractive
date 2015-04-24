@@ -60,7 +60,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 
 	public static final int TERRAIN_ANIMATION_DELAY = 200;	
 
-	// The player
+	// The player attached to the client/GUI
 	public Player player;
 	// The number of clients connected to the host
 	public int num_players = 0;		
@@ -86,17 +86,12 @@ public class SquintGUI extends JPanel implements KeyListener {
 	// Texture Groups for the avatars
 	AvatarGroup avatars = null;
 
-	// TEMP CLIENT-SERVER STUFF
-	// The "server" (not really)
-	PretendServer host = null;
 	// The "players connected to the server" (not really)
 	public HashMap<Integer, Player> players = null;
-	// The thread that waits for data from the host and processes it
-	Thread receiverThread = null;
-	String avatarName;	// Server will tell us what value this holds
-	MainClient mainClient;
-	// END TEMP CLIENT-SERVER STUFF
 
+	// The client attached to this GUI
+	MainClient mainClient;
+	
 	/** Constructor to setup the GUI components */
 	public SquintGUI(MainClient mainClient) 
 	{				

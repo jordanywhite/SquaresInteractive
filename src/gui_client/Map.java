@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 
+ * The interactive room.
  * 
  * @author Caleb Piekstra
  *

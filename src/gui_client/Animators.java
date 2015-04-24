@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 /**
  * 
+ * Animations to be used in the interactive room
  * 
  * @author Caleb Piekstra
  *

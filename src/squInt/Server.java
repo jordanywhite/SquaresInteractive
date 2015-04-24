@@ -29,11 +29,6 @@ public class Server {
 	public static final int SERVER_ID = 0;
 
 	/*
-	 * Convenient way to know where everyone is for the server
-	 */
-	private int[][] idPos;
-
-	/*
 	 * The id to be assigned to the next client
 	 */
 	private int nextId = 0;
