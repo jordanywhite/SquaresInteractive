@@ -1,2 +1,640 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<root path="/home/brycematsuda/Documents/GitHub/SquaresInteractive/res\images\"/>
+<root path="C:\Users\Caleb\Documents\GitHub\SquaresInteractive\res\images">
+    <dir name="avatars">
+        <dir name="re">
+            <dir name="blond">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="blonde_blue">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="blonde_hairband">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="blond_spiky">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="blue">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="brown">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="brown_green">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="brown_mustache">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="brown_ponytail">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="dark_knight">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="glasses">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="graying">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="green">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="pirate">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="purple">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="red_mustache">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+            <dir name="strawberry">
+                <file>0-1.png</file>
+                <file>0-2.png</file>
+                <file>0.png</file>
+                <file>1-1.png</file>
+                <file>1-2.png</file>
+                <file>1.png</file>
+                <file>2-1.png</file>
+                <file>2-2.png</file>
+                <file>2.png</file>
+                <file>3-1.png</file>
+                <file>3-2.png</file>
+                <file>3.png</file>
+            </dir>
+        </dir>
+    </dir>
+    <dir name="house">
+        <dir name="bench_1">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>12.png</file>
+            <file>13.png</file>
+            <file>14.png</file>
+            <file>15.png</file>
+            <file>16.png</file>
+            <file>17.png</file>
+            <file>18.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="bench_2">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>12.png</file>
+            <file>13.png</file>
+            <file>14.png</file>
+            <file>15.png</file>
+            <file>16.png</file>
+            <file>17.png</file>
+            <file>18.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="kitchen">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+        </dir>
+        <dir name="shadows">
+            <file>4.png</file>
+            <file>corner-q1.png</file>
+            <file>corner-q4.png</file>
+            <file>edge-q1.png</file>
+            <file>edge-q3.png</file>
+            <file>left.png</file>
+            <file>top.png</file>
+        </dir>
+        <dir name="table">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>12.png</file>
+            <file>17.png</file>
+            <file>18.png</file>
+            <file>19.png</file>
+            <file>20.png</file>
+            <file>21.png</file>
+            <file>22.png</file>
+            <file>23.png</file>
+            <file>component-1-1.png</file>
+            <file>component-1-2.png</file>
+            <file>component-1-3.png</file>
+            <file>component-2-1.png</file>
+            <file>component-2-2.png</file>
+            <file>component-2-3.png</file>
+            <file>component-3-1.png</file>
+            <file>component-3-2.png</file>
+            <file>component-3-3.png</file>
+        </dir>
+        <dir name="walls">
+            <file>bottom-1.png</file>
+            <file>bottom-2.png</file>
+            <file>corner-q1-large.png</file>
+            <file>corner-q1-small.png</file>
+            <file>corner-q2-large.png</file>
+            <file>corner-q2-small.png</file>
+            <file>corner-q3-large.png</file>
+            <file>corner-q3-small.png</file>
+            <file>corner-q4-large.png</file>
+            <file>corner-q4-small.png</file>
+            <file>left-1.png</file>
+            <file>left-2.png</file>
+            <file>right-1.png</file>
+            <file>right-2.png</file>
+            <file>top-1.png</file>
+            <file>top-2.png</file>
+        </dir>
+        <dir name="walls_dmg">
+            <file>bottom-1.png</file>
+            <file>bottom-2.png</file>
+            <file>corner-q1-large.png</file>
+            <file>corner-q1-small.png</file>
+            <file>corner-q2-large.png</file>
+            <file>corner-q2-small.png</file>
+            <file>corner-q3-large.png</file>
+            <file>corner-q3-small.png</file>
+            <file>corner-q4-large.png</file>
+            <file>corner-q4-small.png</file>
+            <file>left-1.png</file>
+            <file>left-2.png</file>
+            <file>right-1.png</file>
+            <file>right-2.png</file>
+            <file>top-1.png</file>
+            <file>top-2.png</file>
+        </dir>
+        <dir name="wood_floor">
+            <file>normal-1.png</file>
+            <file>normal-2.png</file>
+            <file>normal-3.png</file>
+            <file>normal-4.png</file>
+            <file>special-1.png</file>
+            <file>special-2.png</file>
+        </dir>
+    </dir>
+    <dir name="misc">
+        <file>jump_circle.png</file>
+        <file>transparent.png</file>
+    </dir>
+    <dir name="outside_house">
+        <dir name="cliff_1">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>12.png</file>
+            <file>13.png</file>
+            <file>14.png</file>
+            <file>15.png</file>
+            <file>16.png</file>
+            <file>17.png</file>
+            <file>18.png</file>
+            <file>19.png</file>
+            <file>2.png</file>
+            <file>20.png</file>
+            <file>21.png</file>
+            <file>22.png</file>
+            <file>23.png</file>
+            <file>24.png</file>
+            <file>25.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="cliff_2">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="cliff_shadow">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="fence">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>12.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="fence_dmg">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>12.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="fountain">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+        </dir>
+        <dir name="frence_shadow">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>10.png</file>
+            <file>11.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>9.png</file>
+        </dir>
+        <dir name="grass">
+            <file>bot-1.png</file>
+            <file>bot-left-1.png</file>
+            <file>bot-left-2.png</file>
+            <file>bot-right-1.png</file>
+            <file>bot-right-2.png</file>
+            <file>left-1.png</file>
+            <file>middle-normal-1.png</file>
+            <file>normal-1.png</file>
+            <file>right-1.png</file>
+            <file>top-1.png</file>
+            <file>top-left-1.png</file>
+            <file>top-left-2.png</file>
+            <file>top-right-1.png</file>
+            <file>top-right-2.png</file>
+        </dir>
+        <dir name="house_1">
+            <file>0 (3).png</file>
+            <file>2 (3).png</file>
+            <file>3 (3).png</file>
+            <file>component-1-1.png</file>
+            <file>component-1-2.png</file>
+            <file>component-1-3.png</file>
+            <file>component-2-1.png</file>
+            <file>component-2-2.png</file>
+            <file>component-2-3.png</file>
+            <file>component-3-2.png</file>
+            <file>component-4-2.png</file>
+        </dir>
+        <dir name="house_2">
+            <file>0 (2).png</file>
+            <file>0 (3).png</file>
+            <file>0.png</file>
+            <file>1 (2).png</file>
+            <file>1 (3).png</file>
+            <file>1.png</file>
+            <file>2 (2).png</file>
+            <file>2 (3).png</file>
+            <file>2.png</file>
+            <file>3 (2).png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+            <file>component-1.png</file>
+            <file>component-2.png</file>
+            <file>component-3.png</file>
+            <file>component-4.png</file>
+        </dir>
+        <dir name="house_parts">
+            <file>0 (2).png</file>
+            <file>0 (3).png</file>
+            <file>0 (4).png</file>
+            <file>0 (5).png</file>
+            <file>0 (6).png</file>
+            <file>0 (7).png</file>
+            <file>0.png</file>
+            <file>1 (2).png</file>
+            <file>1 (3).png</file>
+            <file>1 (4).png</file>
+            <file>1 (5).png</file>
+            <file>1 (6).png</file>
+            <file>1 (7).png</file>
+            <file>1.png</file>
+            <file>2 (2).png</file>
+            <file>2 (3).png</file>
+            <file>2 (4).png</file>
+            <file>2 (5).png</file>
+            <file>2 (6).png</file>
+            <file>2.png</file>
+            <file>3 (2).png</file>
+            <file>3 (3).png</file>
+            <file>3 (4).png</file>
+            <file>3 (5).png</file>
+            <file>3 (6).png</file>
+            <file>3.png</file>
+            <file>4 (3).png</file>
+            <file>4 (4).png</file>
+            <file>4 (5).png</file>
+            <file>4.png</file>
+            <file>5 (2).png</file>
+            <file>5 (4).png</file>
+            <file>5.png</file>
+            <file>6 (2).png</file>
+            <file>6 (3).png</file>
+            <file>6.png</file>
+            <file>7.png</file>
+            <file>8.png</file>
+        </dir>
+        <dir name="pavement">
+            <file>bot-1.png</file>
+            <file>bot-left-1.png</file>
+            <file>bot-left-2.png</file>
+            <file>bot-right-1.png</file>
+            <file>bot-right-2.png</file>
+            <file>left-1.png</file>
+            <file>middle-normal-1.png</file>
+            <file>middle-special-1.png</file>
+            <file>middle-special-2.png</file>
+            <file>middle-special-3.png</file>
+            <file>middle-special-4.png</file>
+            <file>middle-special-5.png</file>
+            <file>right-1.png</file>
+            <file>top-1.png</file>
+            <file>top-left.png</file>
+            <file>top-right-1.png</file>
+            <file>top-right-2.png</file>
+        </dir>
+        <dir name="ruin">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+        </dir>
+        <dir name="town_shadow">
+            <file>0.png</file>
+            <file>1.png</file>
+            <file>2.png</file>
+            <file>3.png</file>
+            <file>4.png</file>
+            <file>5.png</file>
+            <file>6.png</file>
+        </dir>
+        <dir name="tree">
+            <file>bush-1.png</file>
+            <file>bush-2.png</file>
+            <file>bush-shadow.png</file>
+            <file>gate-1.png</file>
+            <file>rock-large-1.png</file>
+            <file>rock-large-2.png</file>
+            <file>rock-large-shadow.png</file>
+            <file>rock-small-1.png</file>
+            <file>rock-small-2.png</file>
+            <file>rock-small-shadow.png</file>
+            <file>statue-1.png</file>
+            <file>tree-1.png</file>
+            <file>tree-2.png</file>
+            <file>tree-shadow.png</file>
+        </dir>
+        <dir name="water">
+            <file>ani-water-0.png</file>
+            <file>ani-water-1.png</file>
+            <file>ani-water-2.png</file>
+            <file>ani-water-3.png</file>
+            <file>ani-water-4.png</file>
+            <file>ani-water-5.png</file>
+            <file>ani-water-6.png</file>
+            <file>ani-water-7.png</file>
+        </dir>
+    </dir>
+</root>

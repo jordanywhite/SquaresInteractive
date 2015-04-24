@@ -35,7 +35,7 @@ public class DirectoryParser{
 	// Runtime configuration options
 	private static final String rootDir = "res\\images\\";
 	private static final String outputFileName = "Textures";
-	private static final String outputPath = "res\\xml";
+	private static final String outputPath = "res\\xml\\";
 	private static final Boolean outputToDocument = true; 
 	private static final Boolean overwriteExistingFile = true;
 	private static final Boolean timeProgram = true;
@@ -67,7 +67,7 @@ public class DirectoryParser{
 		
 		// Let the user know where the file is
 		System.out.println("Outputing file to:");
-		System.out.println("\t" + outputPath + "\\" + fileName + ".xml\n");
+		System.out.println("\t" + outputPath + fileName + ".xml\n");
 
 		// Keep track of when the program ends so we can do some end-of-the-line methods / output
 	    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -248,9 +248,9 @@ public class DirectoryParser{
             // Make sure the file doesn't already exist before we try writing to it
             File aFile = null;
             if (overwriteExistingFile) {
-            	aFile = createFileNoOverwrite(saveLocation, fileName, ".xml");
-            } else {
             	aFile = createFile(saveLocation, fileName, ".xml");
+            } else {
+            	aFile = createFileNoOverwrite(saveLocation, fileName, ".xml");
             }
             FileOutputStream outputFile = null;
             try {
