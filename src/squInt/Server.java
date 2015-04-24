@@ -66,20 +66,6 @@ public class Server {
 	public static void main(String[] args) {
 		/** TO RUN: run MainServer and then run MainClient numConnections times **/
 		Server server = new Server();
-
-		
-//		// wait until this many connections are established
-//		while(currentNumConnections < totalConnections) {
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-		
-		// send message to all
-//		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
-//		server.serverTable.sendToAll("Snotty trails?");
 		
 		// now have server just wait for inc messages and print them (until program is terminated)
 		while(true) {
@@ -382,6 +368,7 @@ public class Server {
 			case MOVE_UP:	newPoint.y--;	break;
 			case MOVE_LEFT:	newPoint.x--;	break;
 			case MOVE_DOWN:	newPoint.y++;	break;
+			case INTERACT:	break;
 		}
 		return newPoint;
 	}

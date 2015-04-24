@@ -15,19 +15,12 @@ public class PlayerAction {
 	public int playerId;
 	public Action action;
 	
-//	public int direction;
 	public PlayerAction(int playerId, Action action) {
 		this.playerId = playerId;
 		this.action = action;
 	}
 	
 	public static String generateActionMessage(int playerId, int actionInt) {
-//		int actionNum = getActionNum(action);
-//		
-//		if(actionNum == -1) {
-//			return null;
-//		}
-//		
 		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionInt;
 	}
 	

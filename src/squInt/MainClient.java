@@ -7,7 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The main method for a client
+ * The main back-end client
  * 
  * @author Kai Jorgensen
  * @author Bryce Matsuda
@@ -16,31 +16,45 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class MainClient {
-	
+
+	/**
+	 * server IP we're connecting to
+	 */
 	private static final String ipAddr = "localhost";
-	
-	private static final int QUEUE_TIMEOUT = 100; // In minutes
-	
+	//	private static final String ipAddr = "10.12.18.33";
+
+	/**
+	 * The front end GUI attached to this client
+	 */
 	private SquintGUI gui;
-	
-	private static BlockingQueue<String> incMsgQueue = null; // a queue containing any new messages received by the connection
-	
+
+	/**
+	 * a queue containing any new messages received by the connection
+	 */
+	private static BlockingQueue<String> incMsgQueue = null; 
+
+	/**
+	 * how long messages can stay in the queue
+	 */
+	private static final int QUEUE_TIMEOUT = 100; // In minutes
+
+	/**
+	 * Our connection to the server
+	 */
 	public static DataPort connection = null;
-	
-//	private static final String ipAddr = "10.12.18.33";
-	
+
 	public static void main(String[] args) {
 
 		// Create the main client
 		MainClient client = new MainClient();
-		
+
 		// Set up the GUI for the client
-		
+
 		// THIS IS LITERALLY THE WORST
 		client.gui = new SquintGUI(client);
 		client.gui.initGUI(client.gui);
 		// END
-		
+
 		// TODO I am not sure if this already happens, but we 
 		// should keep trying to connect if the connection fails 
 		while (connection == null) {
@@ -59,32 +73,32 @@ public class MainClient {
 				Thread serverPlayerThread = new Thread(connection);
 				serverPlayerThread.start();
 			} catch (IOException e) {
-				System.out.println("Client failed to connect to host: Are you sure the server is running?");
+				System.out.println("Client failed to connect to host: " +
+						"Are you sure the server is running?");
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
-//				e.printStackTrace();
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		// ok, connection is established. 
-		
+
 		// Set up the thread to listen for messages from the server
 		Thread receiverThread = new Thread(client.new Receiver());
 		receiverThread.start();
-		
+
 		//connection.send("SI#" + DataPort.INIT_MSG);	
-		
+
 	}
-	
+
 	public class Receiver implements Runnable {
-		
+
 		public final int POLL_TIMEOUT = QUEUE_TIMEOUT;
-		
+
 		@Override
 		public void run() {
 			while (true) {				
@@ -99,25 +113,25 @@ public class MainClient {
 				}
 				// If there is no data, try again
 				if (msg == null) {
-					System.out.println("TIMEOUT: Did not receive any data in " + POLL_TIMEOUT + " minutes. Closing connection.");
+					System.out.println("TIMEOUT: Did not receive any data in " 
+							+ POLL_TIMEOUT + " minutes. Closing connection.");
 					// not really closing the connection, but kill the receiver
 					return;
 				}
 				System.out.println("SUCCESS: Data received! Data: " + msg);
-				
-				
+
+
 
 				String[] splitMsg = msg.split("#");
 				int msgType = Integer.parseInt(splitMsg[1]);
-				
+
 				// If we have an INIT_MSG, create a player
 				// Let's pretend we get data from the host and it is an INIT_MSG
 				if (msgType == DataPort.INIT_MSG) {
-					// TODO: PARSE THE INIT MESSAGE (make a class for it!)
-					
+					// TODO: Make a separate class for parsing the data
 					try {
 						String[] payload = splitMsg[2].split("@");
-						
+
 						if(msgType == DataPort.INIT_MSG) {
 							int playerId = Integer.parseInt(payload[0]);
 							String avatarName = payload[1];
@@ -129,16 +143,18 @@ public class MainClient {
 								gui.createPlayer(playerId, avatarName, x, y);
 							}
 						}
-						
+
 					} catch (NumberFormatException e) {
 						System.out.println("ERROR PARSING MESSAGE: " + msg);
 					}
 				}
-				
-				// If we have an ACTION_MSG, update map so that the specified player is at the specified location
+
+				// If we have an ACTION_MSG, update map so that the specified player 
+				// is at the specified location
 				PlayerAction playerAction = PlayerAction.parseFromMsg(msg);
 				if (playerAction != null) {
-					gui.movePlayer(PlayerAction.getActionNum(playerAction.action), playerAction.playerId);
+					gui.movePlayer(PlayerAction.getActionNum(playerAction.action), 
+							playerAction.playerId);
 				}
 			}
 		}		
