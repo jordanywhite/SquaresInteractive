@@ -20,18 +20,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.GrayFilter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import squInt.MainClient;
+import squInt.PlayerAction;
 
 /**
  * This code is the GUI portion of a larger project being built for a networking class
@@ -59,15 +57,6 @@ public class SquintGUI extends JPanel implements KeyListener {
 	public static final int MAP_LAYERS = 4;	// The number of texture layers in the map
 	public static final int MAP_LEVEL = 0;	// Currently unimplemented
 	
-	// Toggle between AI mode and client mode
-//	private final boolean AI_MODE = false;					
-	// The list of ai players for triggering movements
-//	private Player[] ai_players;					
-	// The number of AI requested
-//	private static final int NUM_AI_PLAYERS = 4;	
-	// The delay in ms between the AI movements
-//	public static final int AI_MOVE_DELAY = 100; 		
-	// The delay in ms between terrain updates
 	public static final int TERRAIN_ANIMATION_DELAY = 200;	
 	
 	// The player
@@ -100,14 +89,15 @@ public class SquintGUI extends JPanel implements KeyListener {
 	// The "server" (not really)
 	PretendServer host = null;
 	// The "players connected to the server" (not really)
-	HashMap<Integer, Player> players = null;
+	public HashMap<Integer, Player> players = null;
 	// The thread that waits for data from the host and processes it
 	Thread receiverThread = null;
 	String avatarName;	// Server will tell us what value this holds
+	MainClient mainClient;
 	// END TEMP CLIENT-SERVER STUFF
 
 	/** Constructor to setup the GUI components */
-	public SquintGUI() 
+	public SquintGUI(MainClient mainClient) 
 	{				
 		// Create a resource loader so we can get textures
 		resLoad = new ResourceLoader();		
@@ -134,39 +124,7 @@ public class SquintGUI extends JPanel implements KeyListener {
         
 		// Set up the hashtable of players
 		players = new HashMap<Integer, Player>();
-
-//        // Determine what mode to start the client in
-//		if (AI_MODE) {
-//			// Set up the AI players and lock out user input
-//			initAI();
-//		} else {
-//			// Create a new player
-//			avatarName = "glasses";
-//			player = createPlayer(avatarName);	
-//		}	
-		
-		// TEMP CLIENT-SERVER STUFF
-		// Create a copy of the map squares 
-//		MapSquare[][] squares = new MapSquare[mapSquares.length][mapSquares[0].length];
-//		for (int row = 0; row < mapSquares.length; row++) {
-//			for (int col = 0; col < mapSquares[row].length; col++) {
-//				MapSquare original = mapSquares[row][col];
-//				squares[row][col] = new MapSquare(original.sqType, original.isOccupied, original.playerId, row, col);
-//			}
-//		}
-//		Player[] playersArr = new Player[players.size()];
-//		int playerIdx = 0;
-//	    Iterator<Player> playerIterator = players.values().iterator();
-//	    while (playerIterator.hasNext()) {
-//	    	playersArr[playerIdx++] = playerIterator.next();
-//	    }	
-		// Init the server "host" with our copy of the map and an array of the players in the map
-//		host = new PretendServer(squares, playersArr);
-		// Create a receiver thread that waits for data from the host
-//		receiverThread = new Thread(new Receiver());
-		// Start the receiver
-//		receiverThread.start();
-		// END TEMP CLIENT-SERVER STUFF
+		this.mainClient = mainClient;
 	}
 	
 	/**
@@ -180,7 +138,10 @@ public class SquintGUI extends JPanel implements KeyListener {
 		if (playerId > num_players) {
 			num_players = playerId;
 		}
-		player = new Player(avatarName, mapSquares, Player.Move.DOWN, true, playerId);		
+		Player player = new Player(avatarName, mapSquares, Player.Move.DOWN, true, playerId);
+		if (this.player == null) {
+			this.player = player;
+		}
 //		// Add the player to the list of players
 		players.put(player.id, player);	
 		// Update the map to indicate the player "spawning"
@@ -188,6 +149,13 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Return a reference to the player if needed
 //		return player;
 	}
+
+	public void createPlayer(int playerId, String avatarName, int x, int y) {
+		createPlayer(playerId, avatarName);
+		changeMapOccupation(player.x, player.y, player.id, false);
+		
+		changeMapOccupation(x, y, player.id, true);
+	}	
 	
 	/**
 	 * This sets up the room so we can draw it
@@ -248,7 +216,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new SquintGUI().initGUI(new SquintGUI());
+//		new SquintGUI().initGUI(new SquintGUI());
 	}
 	
 	public void initGUI(final SquintGUI gui) {
@@ -331,7 +299,9 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param direction
 	 * @param player
 	 */
-	public void movePlayer(int direction, Player player) {
+	public void movePlayer(int direction, int playerId) {
+		// The player in our GUI that needs to move
+		Player player = players.get(playerId);
 		// A callable method so we can repaint during animation
 		PlayerAnimator aniUp = null;
 		
@@ -362,6 +332,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 			aniUp.setPlayer(player);
 		}
 		MovePlayer.movePlayer(direction, player, aniUp);
+		repaint();
 	}
 	
 	/**
@@ -732,6 +703,11 @@ public class SquintGUI extends JPanel implements KeyListener {
 	        	moveDirection = (player.direction + 1) % (Player.Move.RIGHT + 1);
 	        }
 	        
+	        if (moveDirection != -1) { 
+	        	String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
+	        	mainClient.connection.send(sendMe);	        	
+	        }
+	         
 	        
 	        // TODO this is where we send a move request to the server that includes our player.id and the moveDirection
 	        
@@ -759,5 +735,5 @@ public class SquintGUI extends JPanel implements KeyListener {
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) { }	
+	public void keyTyped(KeyEvent e) { }
 }

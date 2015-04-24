@@ -16,14 +16,14 @@ public class PlayerAction {
 		this.action = action;
 	}
 	
-	public String generateMessage() {
-		int actionNum = getActionNum(action);
-		
-		if(actionNum == -1) {
-			return null;
-		}
-		
-		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionNum;
+	public static String generateActionMessage(int playerId, int actionInt) {
+//		int actionNum = getActionNum(action);
+//		
+//		if(actionNum == -1) {
+//			return null;
+//		}
+//		
+		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionInt;
 	}
 	
 	public static PlayerAction parseFromMsg(String msg) {

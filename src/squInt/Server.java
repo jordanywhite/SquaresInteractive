@@ -9,6 +9,7 @@ import gui_client.ResourceLoader;
 import gui_client.SquintGUI;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -31,7 +32,7 @@ public class Server {
 	 */
 	private int nextId = 0;
 	
-	public static int totalConnections = 5;
+	public static int totalConnections = 2;
 	
 	// Keep track of how many clients are currently connected
 	private static int currentNumConnections = 0;
@@ -44,6 +45,8 @@ public class Server {
 	
 	// The avatar names
 	private String[] avatarNames = null;
+	
+	private ArrayList<String> initMsgs = new ArrayList<String>();
 	
 	// Holds the server connection table
 	private ServerConnectionTable serverTable = null;
@@ -59,33 +62,45 @@ public class Server {
 		Server server = new Server();
 
 		
-		// wait until this many connections are established
-		while(currentNumConnections < totalConnections) {
+//		// wait until this many connections are established
+//		while(currentNumConnections < totalConnections) {
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		
+		// send message to all
+//		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
+//		server.serverTable.sendToAll("Snotty trails?");
+		
+		// now have server just wait for inc messages and print them (until program is terminated)
+		while(true) {
 			if (server.serverTable.getNumConnections() != currentNumConnections) {
 				currentNumConnections = server.serverTable.getNumConnections();
 				// A player is registered with the same ID as the connection
 				String playerInitMsg = server.registerUser();
+				server.initMsgs.add(playerInitMsg);
 				// Since the player / connection ID is stored in nextId which is incremented,
 				// the id for this connection is nextId - 1;
-				server.serverTable.getConnectionByUniqueId(server.nextId-1).send(playerInitMsg);
+				server.serverTable.sendToAll(playerInitMsg);
+				
+				// Every time somone connects, resend all player locations to all clients
+				for (String initMsg : server.initMsgs) {
+					server.serverTable.sendToAll(initMsg);
+				}
 			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		// send message to all
-		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
-		server.serverTable.sendToAll("Snotty trails?");
-		
-		// now have server just wait for inc messages and print them (until program is terminated)
-		while(true) {
+			
 			if(server.serverQueue.peek() != null) {
 				// ServerQueuedMessage object just contains the source DataPort and the received String
 				ServerQueuedMessage sqm = server.serverQueue.poll();
 				System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
+				
+				if (server.requestAction(PlayerAction.parseFromMsg(sqm.message))) {
+					// send diff
+					server.serverTable.sendToAll(sqm.message);
+				}
 			}
 			
 			try {
@@ -117,8 +132,11 @@ public class Server {
 	
 
 	
-	public String generatePlayerInitMessage(int playerId, String playerAvatarName) {				
-		return "SI#" + DataPort.INIT_MSG + "#" + playerId + "@" + playerAvatarName;
+	public String generatePlayerInitMessage(int playerId) {				
+		return "SI#" + DataPort.INIT_MSG + "#" + playerId 
+				+ "@" + players.get(playerId).avatarName 
+				+ "@" + players.get(playerId).x 
+				+ "@" + players.get(playerId).y;
 	}
 	
 	private void generateMetaData() {
@@ -180,14 +198,14 @@ public class Server {
 		// Increment the user id for the next user and return the id we used for
 		// this user
 		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], mapSquares, Player.Move.DOWN, true, nextId++);
-		if (newPlayer == null) {
+		if (newPlayer.avatarName == null) {
 			// failed to create user?
 			return null;
 		}
 		addUser(newPlayer);
 		updateMap(mapSquares[newPlayer.y][newPlayer.x], newPlayer.id);
 				
-		return generatePlayerInitMessage(newPlayer.id, newPlayer.avatarName);
+		return generatePlayerInitMessage(newPlayer.id);
 	}
 
 	/**
