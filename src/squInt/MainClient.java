@@ -1,10 +1,11 @@
-package squInt;
-
-import gui_client.SquintGUI;
+package squint;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import serverManagement.DataPort;
+import actions.PlayerAction;
 
 /**
  * The main back-end client
@@ -41,7 +42,7 @@ public class MainClient {
 	/**
 	 * Our connection to the server
 	 */
-	public static DataPort connection = null;
+	public DataPort connection = null;
 
 	public static void main(String[] args) {
 
@@ -49,28 +50,31 @@ public class MainClient {
 		MainClient client = new MainClient();
 
 		// Set up the GUI for the client
-
-		// THIS IS LITERALLY THE WORST
 		client.gui = new SquintGUI(client);
 		client.gui.initGUI(client.gui);
-		// END
+		
+		client.waitForConnection(client);
+		// ok, connection is established. 
 
-		// TODO I am not sure if this already happens, but we 
-		// should keep trying to connect if the connection fails 
-		while (connection == null) {
+		client.setUpReceiverThread(client);
+	}
+	
+	private void waitForConnection(MainClient client) {
+		// keep trying to connect if the connection fails 
+		while (client.connection == null) {
 			try {
 				// init a connection to the server
-				connection = new DataPort(ipAddr, 9999);
+				client.connection = new DataPort(ipAddr, 9999);
 				// If a connection could not be established, wait a little and try again
-				if (connection == null) {	
+				if (client.connection == null) {	
 					Thread.sleep(1000);
 					continue;
 				}
 				// set the queue to point to the DataPort's queue
-				incMsgQueue = connection.getIncMessageQueue();
+				incMsgQueue = client.connection.getIncMessageQueue();
 				System.out.println("Connection established!");
 				// start DataPort listener thread
-				Thread serverPlayerThread = new Thread(connection);
+				Thread serverPlayerThread = new Thread(client.connection);
 				serverPlayerThread.start();
 			} catch (IOException e) {
 				System.out.println("Client failed to connect to host: " +
@@ -84,15 +88,14 @@ public class MainClient {
 				e1.printStackTrace();
 			}
 		}
-
-		// ok, connection is established. 
-
+	}
+	
+	private void setUpReceiverThread(MainClient client) {
 		// Set up the thread to listen for messages from the server
 		Thread receiverThread = new Thread(client.new Receiver());
 		receiverThread.start();
 
-		//connection.send("SI#" + DataPort.INIT_MSG);	
-
+		//connection.send("SI#" + DataPort.INIT_MSG);
 	}
 
 	/**

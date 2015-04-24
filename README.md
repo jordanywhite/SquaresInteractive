@@ -2,14 +2,14 @@
 Networking Project
 
 ## Instructions
-* To test out the GUI, compile and run the file: DirectoryParser.java
-* This will place a file called Textures.xml in the res/images/ folder (you may have to refresh the directory)
-* Copy this generated file into res/xml/ and overwrite any existing version
-* Now compile and run SquintGUI.java
+* To view JUST the GUI, compile and run SquingGUI.java
+* To create a server that can host clients, run MainServer.java
+* To join the server and use the GUI to interact with the room, run MainClient.java
+	and be sure that MainServer.java is running.
 * Enjoy!
 
 ### Controls 
-* Move up		W				  |	UpArrow
+* Move Up		W				  |	UpArrow
 * Move Left		A				|	LeftArrow
 * Move Down		S				|	DownArrow
 * Move Right	D				|	RightArrow
