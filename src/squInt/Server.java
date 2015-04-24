@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * The User object for the server.
+ * The server that hosts the interactive room.
  *
  * @author Kai Jorgensen
  * @author Bryce Matsuda
@@ -99,6 +99,9 @@ public class Server {
 		}
 	}
 
+	/**
+	 * constructor
+	 */
 	public Server() {		
 		// Generate (unfortunately) a lot of data but only save the meta data
 		generateMetaData();
@@ -118,14 +121,21 @@ public class Server {
 	}
 	
 
-	
+	/**
+	 *  creates a server message that broadcasts a new user connection
+	 *  
+	 * @param playerId the connecting player
+	 * @return the new server message
+	 */
 	public String generatePlayerInitMessage(int playerId) {				
 		return "SI#" + DataPort.INIT_MSG + "#" + playerId 
 				+ "@" + players.get(playerId).avatarName 
 				+ "@" + players.get(playerId).x 
 				+ "@" + players.get(playerId).y;
 	}
-	
+	/**
+	 * generateMetaData - initialize server meta data
+	 */
 	private void generateMetaData() {
 		// Create a resource loader so we can get textures
 		ResourceLoader resLoad = new ResourceLoader();		
@@ -145,14 +155,6 @@ public class Server {
 			avatarNames[idx++] = avatarName;
 		}
 		players = new HashMap<Integer, Player>();
-	}
-
-	/**
-	 * getMapSquares The one map to rule them all
-	 * 
-	 */
-	public MapSquare[][] getMapSquares() {
-		return this.mapSquares;
 	}
 
 	/**
@@ -178,6 +180,11 @@ public class Server {
 		return generatePlayerInitMessage(newPlayer.id);
 	}
 	
+	/**
+	 * Helper method for finding a random position to place the user
+	 * 
+	 * @return the new location
+	 */
 	private Point findLocationForPlayer() {
 		Point spawnHere = new Point();
 		// Pick a pseudorandom location to place the player based on the given map
@@ -226,11 +233,16 @@ public class Server {
 		changeMapOccupation(removeThisGuy.x, removeThisGuy.y, -1, false);
 		players.remove(id);
 		
-		// At this point we would broadcast removing the player? TODO
+		// TODO: At this point we would broadcast removing the player?
 		
 		return true;
 	}
 	
+	/**
+	 * addUser - adds a user to the player list
+	 * 
+	 * @param player the player to add
+	 */
 	public void addUser(Player player) {
 		players.put(player.id, player);
 	}
@@ -283,7 +295,6 @@ public class Server {
 		
 		int moveDirection = PlayerAction.getActionNum(playerAction.action);		
 
-
 		// TODO BROADCAST THE MOVE (DIFF) TO ALL CONNECTED CLIENTS
 		return isValidMove(moveDirection, playerId);
 	}
@@ -321,6 +332,12 @@ public class Server {
 		return false;
 	}
 	
+	/**
+	 * updatePlayerPosition - updates a players position to a given point
+	 * 
+	 * @param newPoint the new position
+	 * @param playerId the player to move to this new position
+	 */
 	private void updatePlayerPosition(Point newPoint, int playerId) {
 		Player player = players.get(playerId);
 		player.x = newPoint.x;

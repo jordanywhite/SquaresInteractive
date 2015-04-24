@@ -95,6 +95,11 @@ public class MainClient {
 
 	}
 
+	/**
+	 * 
+	 * Receiver - parses messages sent by the server
+	 *
+	 */
 	public class Receiver implements Runnable {
 
 		public final int POLL_TIMEOUT = QUEUE_TIMEOUT;
@@ -119,8 +124,6 @@ public class MainClient {
 					return;
 				}
 				System.out.println("SUCCESS: Data received! Data: " + msg);
-
-
 
 				String[] splitMsg = msg.split("#");
 				int msgType = Integer.parseInt(splitMsg[1]);

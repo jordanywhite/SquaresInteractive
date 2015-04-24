@@ -1,6 +1,8 @@
 package squInt;
 
 /**
+ * PlayerAction
+ * 
  * pairs an action with a playerId. This will get converted into a
  * string (helper methods are here to encode/decode) and sent over the
  * network

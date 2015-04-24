@@ -49,30 +49,8 @@ public class ObjectTangle {
 			if (img.logicalCol > currentLogCol) {
 				currentCol += img.actualCols;
 			}
-//			grid.addImage(firstRow, firstCol, numRows, numCols);
 		}
-		
-		
-		
-		
-		
-//		countLogical(components);
-//		calculatePhysical(components);
 	}
-	
-//	private void calculatePhysical(ArrayList<Texture> components) {
-//		for (Texture t: components) {			
-//			ImageDim img = new ImageDim(t.textureFile);
-//			// Update the number of logical rows
-//			if (img.actualRows > numActualRows) {
-//				numActualRows += img.actualRows;
-//			}
-//			// Update the number of logical cols
-//			if (img.actualCols > numActualCols) {
-//				numActualCols += img.actualCols;
-//			}
-//		}
-//	}
 	
 	private int roundUp(int value) {
 		if (value % squareDim != 0) {
@@ -81,59 +59,6 @@ public class ObjectTangle {
 		}
 		return value;
 	}
-	
-	private void countLogical(ArrayList<Texture> components) {
-		for (Texture t : components) {
-			// Names are expected to look like "component-row-col.png" where row and col are ints
-			String name = t.textureName;
-			componentNames.add(name);
-			// Extract the row value from between the two dashes
-			int row = Integer.parseInt(name.substring(name.indexOf('-')+1, name.lastIndexOf('-')));
-			// Extract the col from the end
-			int col = Integer.parseInt(name.substring(name.lastIndexOf('-')+1, name.indexOf('.')));
-
-			// Check if we are in a new logical row or column
-			if (row > numLogicalRows || col > numLogicalCols) {
-				// Figure out the dimensions of the image
-				// Update the number of logical rows
-				if (row > numLogicalRows) {
-					numLogicalRows = row;
-				}
-				// Update the number of logical cols
-				if (col > numLogicalCols) {
-					numLogicalCols = col;
-				}
-			}
-			
-			
-			
-			
-//			// Check if we are in a new logical row or column
-//			if (row > numLogicalRows || col > numLogicalCols) {
-//				// Figure out the dimensions of the image
-//				BufferedImage bimg = null;
-//				try {
-//					bimg = ImageIO.read(t.textureFile);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				if (bimg == null) {
-//					return;
-//				}
-//				// Update the number of logical rows
-//				if (row > numLogicalRows) {
-//					numLogicalRows = row;
-//					numActualRows += roundUp(bimg.getHeight()) / squareDim;
-//				}
-//				// Update the number of logical cols
-//				if (col > numLogicalCols) {
-//					numLogicalCols = col;
-//					numActualCols += roundUp(bimg.getWidth()) / squareDim;
-//				}
-//			}
-		}
-	}	
 	
 	public class PhysicalGrid {
 		// This is essentially a dynamic [row][col] scheme with a boolean to indicate whether
@@ -221,16 +146,6 @@ public class ObjectTangle {
 			actualRows = roundUp(imageHeight) / squareDim;
 			imageWidth = bimg.getWidth();
 			actualCols = roundUp(imageWidth) / squareDim;
-		}
-		
-		private void getLogical(Texture t) {
-			// Names are expected to look like "component-row-col.png" where row and col are ints
-			String name = t.textureName;
-//			componentNames.add(name);
-			// Extract the row value from between the two dashes
-			logicalRow = Integer.parseInt(name.substring(name.indexOf('-')+1, name.lastIndexOf('-')));
-			// Extract the col from the end
-			logicalCol = Integer.parseInt(name.substring(name.lastIndexOf('-')+1, name.indexOf('.')));
 		}
 	}
 }

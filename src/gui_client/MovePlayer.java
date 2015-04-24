@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 
+ * Animates a player's movement across the room
  * 
  * @author Caleb Piekstra
  *

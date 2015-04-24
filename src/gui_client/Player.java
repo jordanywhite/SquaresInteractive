@@ -6,6 +6,7 @@ import java.util.TimerTask;
 
 /**
  * 
+ * The back end user to be used in the interactive room
  * 
  * @author Caleb Piekstra
  *
@@ -32,14 +33,14 @@ public class Player {
 	// Player attributes
 	public int x; 						// the x location of the player using tile coordinates
 	public int y;						// the y location of the player using tile coordinates
-	public int direction;
-	public boolean allowedToMove;
-	public int animatePhase;
-	private Timer moveTimer = null;
-	public int id;
-	public int speed;
-	public boolean inAnimationPhase;
-	public boolean isJumping;
+	public int direction;				// direction the player want to move
+	public boolean allowedToMove;		// is player allowed to move?
+	public int animatePhase;			// which animation phase player is in
+	private Timer moveTimer = null;		// delay timer
+	public int id;						// player id
+	public int speed;					// player movement speed
+	public boolean inAnimationPhase;	// is player being animated?
+	public boolean isJumping;			// is player jumping?
 	
 	// Holds the textures for the player 
 	public String avatarName = null;
@@ -47,6 +48,11 @@ public class Player {
 	// Resources
 	public ResourceLoader resources = null;
 	
+	/**
+	 * constructor
+	 * 
+	 * initialize everything!
+	 */
 	public Player(String avatarName, int direction, boolean canIMove, int playerIdx, int x, int y) {
 		// If the direction was incorrect, set it to be a default DOWN direction
 		if (direction > Move.RIGHT || direction < Move.DOWN) {
