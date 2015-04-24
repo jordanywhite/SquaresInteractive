@@ -167,24 +167,6 @@ public class Server {
 	}
 
 	/**
-	 * getPlayerPos retreive x and y position for a player in a point
-	 * 
-	 * @param id
-	 *            the client
-	 * @return a point with the x and y pos of a player, or null if id is unused
-	 */
-	public Point getPlayerPos(int id) {
-		for (int j = 0; j < Room.HEIGHT; j++) {
-			for (int i = 0; i < Room.WIDTH; i++) {
-				if (idPos[i][j] == id) {
-					return new Point(i, j);
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * getMapSquares The one map to rule them all
 	 * 
 	 */
