@@ -25,7 +25,7 @@ public class MainClient {
 	
 	private static BlockingQueue<String> incMsgQueue = null; // a queue containing any new messages received by the connection
 	
-	private static DataPort connection = null;
+	public static DataPort connection = null;
 	
 //	private static final String ipAddr = "10.12.18.33";
 	
@@ -35,8 +35,11 @@ public class MainClient {
 		MainClient client = new MainClient();
 		
 		// Set up the GUI for the client
-		client.gui = new SquintGUI();
+		
+		// THIS IS LITERALLY THE WORST
+		client.gui = new SquintGUI(client);
 		client.gui.initGUI(client.gui);
+		// END
 		
 		// TODO I am not sure if this already happens, but we 
 		// should keep trying to connect if the connection fails 
@@ -73,25 +76,8 @@ public class MainClient {
 		// Set up the thread to listen for messages from the server
 		Thread receiverThread = new Thread(client.new Receiver());
 		receiverThread.start();
-//		
-//		// wait until we receive a message
-//		String msg = null;
-//		while (msg == null) {
-//			try {
-//				// Wait for the message
-//				msg = incMsgQueue.poll(QUEUE_TIMEOUT, TimeUnit.MINUTES);
-//			} catch (InterruptedException e) {				
-//				e.printStackTrace();
-//			}			
-//		}
-//		
-//		// print the message!
-//		// poll() also removes it from the queue
-//		System.out.println("RCVD: " + msg);
-//		
-//		// send a response
-//		connection.send("Trails indeed!");
-//		System.out.println("SENT: Trails indeed!");
+		
+		//connection.send("SI#" + DataPort.INIT_MSG);	
 		
 	}
 	
@@ -117,26 +103,43 @@ public class MainClient {
 					// not really closing the connection, but kill the receiver
 					return;
 				}
-				System.out.println("SUCCESS: Data received!");
+				System.out.println("SUCCESS: Data received! Data: " + msg);
 				
 				
+
+				String[] splitMsg = msg.split("#");
+				int msgType = Integer.parseInt(splitMsg[1]);
 				
 				// If we have an INIT_MSG, create a player
-				// TODO
-				
 				// Let's pretend we get data from the host and it is an INIT_MSG
-				if (gui.player == null) {
-					gui.createPlayer(0, "glasses");
+				if (msgType == DataPort.INIT_MSG) {
+					// TODO: PARSE THE INIT MESSAGE (make a class for it!)
+					
+					try {
+						String[] payload = splitMsg[2].split("@");
+						
+						if(msgType == DataPort.INIT_MSG) {
+							int playerId = Integer.parseInt(payload[0]);
+							String avatarName = payload[1];
+							int x = Integer.parseInt(payload[2]);
+							int y = Integer.parseInt(payload[3]);
+							// If we are receiving a spawn player message for a player we already
+							// know about, do not create it							
+							if (!gui.players.containsKey(playerId)) {
+								gui.createPlayer(playerId, avatarName, x, y);
+							}
+						}
+						
+					} catch (NumberFormatException e) {
+						System.out.println("ERROR PARSING MESSAGE: " + msg);
+					}
 				}
 				
-				// If we have an UPDATE_MSG, update map so that the specified player is at the specified location
-				// TODO
-				
-				// If we have movement data, it's time to move
-				// TODO
-//				if () {
-//					gui.movePlayer(direction, player);			
-//				}
+				// If we have an ACTION_MSG, update map so that the specified player is at the specified location
+				PlayerAction playerAction = PlayerAction.parseFromMsg(msg);
+				if (playerAction != null) {
+					gui.movePlayer(PlayerAction.getActionNum(playerAction.action), playerAction.playerId);
+				}
 			}
 		}		
 	}

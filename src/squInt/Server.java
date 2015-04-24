@@ -9,6 +9,9 @@ import gui_client.ResourceLoader;
 import gui_client.SquintGUI;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -35,7 +38,7 @@ public class Server {
 	 */
 	private int nextId = 0;
 	
-	public static int totalConnections = 5;
+	public static int totalConnections = 2;
 	
 	// Keep track of how many clients are currently connected
 	private static int currentNumConnections = 0;
@@ -48,6 +51,8 @@ public class Server {
 	
 	// The avatar names
 	private String[] avatarNames = null;
+	
+	private ArrayList<String> initMsgs = new ArrayList<String>();
 	
 	// Holds the server connection table
 	private ServerConnectionTable serverTable = null;
@@ -63,33 +68,45 @@ public class Server {
 		Server server = new Server();
 
 		
-		// wait until this many connections are established
-		while(currentNumConnections < totalConnections) {
+//		// wait until this many connections are established
+//		while(currentNumConnections < totalConnections) {
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		
+		// send message to all
+//		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
+//		server.serverTable.sendToAll("Snotty trails?");
+		
+		// now have server just wait for inc messages and print them (until program is terminated)
+		while(true) {
 			if (server.serverTable.getNumConnections() != currentNumConnections) {
 				currentNumConnections = server.serverTable.getNumConnections();
 				// A player is registered with the same ID as the connection
 				String playerInitMsg = server.registerUser();
+				server.initMsgs.add(playerInitMsg);
 				// Since the player / connection ID is stored in nextId which is incremented,
 				// the id for this connection is nextId - 1;
-				server.serverTable.getConnectionByUniqueId(server.nextId-1).send(playerInitMsg);
+				server.serverTable.sendToAll(playerInitMsg);
+				
+				// Every time somone connects, resend all player locations to all clients
+				for (String initMsg : server.initMsgs) {
+					server.serverTable.sendToAll(initMsg);
+				}
 			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		// send message to all
-		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
-		server.serverTable.sendToAll("Snotty trails?");
-		
-		// now have server just wait for inc messages and print them (until program is terminated)
-		while(true) {
+			
 			if(server.serverQueue.peek() != null) {
 				// ServerQueuedMessage object just contains the source DataPort and the received String
 				ServerQueuedMessage sqm = server.serverQueue.poll();
 				System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
+				
+				if (server.requestAction(PlayerAction.parseFromMsg(sqm.message))) {
+					// send diff
+					server.serverTable.sendToAll(sqm.message);
+				}
 			}
 			
 			try {
@@ -121,8 +138,11 @@ public class Server {
 	
 
 	
-	public String generatePlayerInitMessage(int playerId, String playerAvatarName) {				
-		return "SI#" + DataPort.INIT_MSG + "#" + playerId + "@" + playerAvatarName;
+	public String generatePlayerInitMessage(int playerId) {				
+		return "SI#" + DataPort.INIT_MSG + "#" + playerId 
+				+ "@" + players.get(playerId).avatarName 
+				+ "@" + players.get(playerId).x 
+				+ "@" + players.get(playerId).y;
 	}
 	
 	private void generateMetaData() {
@@ -183,15 +203,49 @@ public class Server {
 	public String registerUser() {
 		// Increment the user id for the next user and return the id we used for
 		// this user
-		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], mapSquares, Player.Move.DOWN, true, nextId++);
-		if (newPlayer == null) {
+		Point putThemHere = findLocationForPlayer();
+		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], Player.Move.DOWN, true, nextId++, putThemHere.x, putThemHere.y);
+		if (newPlayer.avatarName == null) {
 			// failed to create user?
 			return null;
 		}
 		addUser(newPlayer);
-		updateMap(mapSquares[newPlayer.y][newPlayer.x], newPlayer.id);
+		changeMapOccupation(newPlayer.x, newPlayer.y, newPlayer.id, true);
 				
-		return generatePlayerInitMessage(newPlayer.id, newPlayer.avatarName);
+		return generatePlayerInitMessage(newPlayer.id);
+	}
+	
+	private Point findLocationForPlayer() {
+		Point spawnHere = new Point();
+		// Pick a pseudorandom location to place the player based on the given map
+		Integer[] numRows = new Integer[mapSquares.length];
+		for (int i = 0; i < numRows.length; i++) {
+			numRows[i] = i;
+		}
+		Collections.shuffle(Arrays.asList(numRows));	// Get a random ordering of valid rows
+		boolean foundSpot = false;
+		// Go through each row until we find a row with an open spot for a player
+		findSpotLoop:
+		for (int row : numRows) {
+			Integer[] numCols = new Integer[mapSquares[row].length];
+			for (int i = 0; i < numCols.length; i++) {
+				numCols[i] = i;
+			}
+			Collections.shuffle(Arrays.asList(numCols));	// Get a random ordering of valid rows
+			for (int col : numCols) {
+				// Make sure the square isn't solid
+				if (mapSquares[row][col].sqType != MapSquare.SquareType.SOLID && mapSquares[row][col].isOccupied == false) {
+					foundSpot = true;
+					spawnHere.x = col;
+					spawnHere.y = row;
+					break findSpotLoop;
+				}
+			}
+		}
+		if (!foundSpot) {
+			System.out.println("No room for player number: " + (nextId - 1));
+		}
+		return spawnHere;
 	}
 
 	/**
@@ -285,6 +339,7 @@ public class Server {
 		// Check if the player is simply rotating in place
 		if (moveDirection != players.get(playerId).direction) {
 			// Player is rotating in place, they can do that all they want
+			players.get(playerId).direction = moveDirection;
 			return true;
 		}
 		// Get the coordinates of the destination square based on the move direction
@@ -294,11 +349,19 @@ public class Server {
 		// Check if the destination square is occupied or SOLID
 		if (!destSquare.isOccupied && !destSquare.sqType.equals(MapSquare.SquareType.SOLID)) {
 			// Update the map to indicate the new location
-			updateMap(destSquare, playerId);
+			updateMap(destSquare, playerId);	
+			// Update the player to be in a new position
+			updatePlayerPosition(destSquarePoint, playerId);
 			// Square is available to be moved into, let the player know they can move
 			return true;
 		}
 		return false;
+	}
+	
+	private void updatePlayerPosition(Point newPoint, int playerId) {
+		Player player = players.get(playerId);
+		player.x = newPoint.x;
+		player.y = newPoint.y;		
 	}
 	
 	/**
@@ -318,7 +381,7 @@ public class Server {
 		oldSquare.playerId = -1;
 		// Set the new square
 		destSquare.playerId = playerId;
-		destSquare.isOccupied = true;
+		destSquare.isOccupied = true;		
 	}
 	
 	/**
@@ -331,11 +394,12 @@ public class Server {
 	 */
 	private Point getNewPlayerPosition(Player player, int direction){
 		Point newPoint = new Point(player.x, player.y);
-		switch(direction) {
-			case Player.Move.RIGHT: newPoint.x++;	break;
-			case Player.Move.UP:	newPoint.y--;	break;
-			case Player.Move.LEFT:	newPoint.x--;	break;
-			case Player.Move.DOWN:	newPoint.y++;	break;
+		Action action = PlayerAction.getActionFromInt(direction);
+		switch(action) {
+			case MOVE_RIGHT: newPoint.x++;	break;
+			case MOVE_UP:	newPoint.y--;	break;
+			case MOVE_LEFT:	newPoint.x--;	break;
+			case MOVE_DOWN:	newPoint.y++;	break;
 		}
 		return newPoint;
 	}
