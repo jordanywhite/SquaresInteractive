@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.HashMap;
 
 /**
- * 
+ * Manages a collection of texture files organized by
+ * their enclosing directory
  * 
  * @author Caleb Piekstra
  *
  */
-
 public class TextureGroup {
 	public HashMap<String, Texture> textures = null;
 	public String groupDir = null;
@@ -27,10 +27,22 @@ public class TextureGroup {
 		}
 	}//end constructor
 	
+	/**
+	 * Get one of the textures contained in the group
+	 * 
+	 * @param textureName	The name of the texture
+	 * @return	The texture
+	 */
 	public Texture getTextureExact(String textureName) {
 		return textures.get(textureName);
 	}
 	
+	/**
+	 * Get textures with names that contain a certain substring
+	 * 
+	 * @param genericName	The generic (non specific) name of the texture
+	 * @return	An ArrayList of textures with a similar name
+	 */
 	public ArrayList<Texture> getTexturesLike(String genericName) {
 		// Holds the similarly named textures
 		ArrayList<Texture> likeTextures = new ArrayList<Texture>();
@@ -48,13 +60,19 @@ public class TextureGroup {
 		return likeTextures;
 	}
 	
-	public ArrayList<Texture> getTexturesStartingWith(String genericName) {
+	/**
+	 * Get textures with names that start with a certain substring
+	 * 
+	 * @param namePrefix	The texture name prefix
+	 * @return	An ArrayList of textures with the same prefix
+	 */
+	public ArrayList<Texture> getTexturesStartingWith(String namePrefix) {
 		// Holds the similarly named textures
 		ArrayList<Texture> likePrefixTextures = new ArrayList<Texture>();
 		// Go through all textures in the group
 		for (String name : textures.keySet()) {
 			// Check if the texture's name is similar to the generic name
-			if (name.startsWith(genericName)) {
+			if (name.startsWith(namePrefix)) {
 				// Add the like texture to the list of like textures
 				likePrefixTextures.add(textures.get(name));
 			}

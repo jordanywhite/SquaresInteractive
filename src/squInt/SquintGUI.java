@@ -577,44 +577,66 @@ public class SquintGUI extends JPanel implements KeyListener {
    \  \___________________________________________________________________________________________
 	\**                                                                                           **/	
 
+	/**
+	 * Key presses allow the primary GUI player (relative to this client's 
+	 * window) to move around the room
+	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
-		//		if (AI_MODE) return;
+		// Check if the press key is in the collection of held keys
 		if (!heldKeys.contains(e.getKeyCode())) {
+			// Keep track of the pressed key's held-state
 			heldKeys.add(new Integer(e.getKeyCode()));		
 		}
+		// Change the player's speed to RUNNING if SHIFT is held
 		if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 			player.speed = Player.RUNNING;	
 		}
+		// Do not process player movements unless the player is allowed to move
 		if (player.allowedToMove) {
 			int moveDirection = -1;
 			if(heldKeys.contains(KeyEvent.VK_D) || heldKeys.contains(KeyEvent.VK_RIGHT)) {
+				// The 'D' key corresponds to RIGHT
 				moveDirection = Player.MoveDirection.RIGHT;
 			} else if(heldKeys.contains(KeyEvent.VK_W) || heldKeys.contains(KeyEvent.VK_UP)) {
+				// The 'W' key corresponds to UP
 				moveDirection = Player.MoveDirection.UP;
 			} else if(heldKeys.contains(KeyEvent.VK_A) || heldKeys.contains(KeyEvent.VK_LEFT)) {
+				// The 'A' key corresonds to LEFT
 				moveDirection = Player.MoveDirection.LEFT;
 			} else if(heldKeys.contains(KeyEvent.VK_S) || heldKeys.contains(KeyEvent.VK_DOWN)) {
+				// The 'S' key corresponds to DOWN
 				moveDirection = Player.MoveDirection.DOWN;
 			} else if(heldKeys.contains(KeyEvent.VK_SPACE)) {
+				// The 'SPACE' key makes the player jump
 				player.isJumping = true;
 				moveDirection = player.direction;
 			} else if(heldKeys.contains(KeyEvent.VK_Q)) {
+				// The 'Q' key makes the player spin counter-clockwise
 				int modVal = Player.MoveDirection.RIGHT + 1;
 				moveDirection = ((((player.direction-1) % modVal) + modVal) % modVal);
 			} else if(heldKeys.contains(KeyEvent.VK_E)) {
+				// The 'E' key makes the player spin clockwise
 				moveDirection = (player.direction + 1) % (Player.MoveDirection.RIGHT + 1);
 			}
 
+			// Check to see if a "movement key" was pressed
 			if (moveDirection != -1) { 
-				String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
-				mainClient.connection.send(sendMe);	        	
+				// If the player is jumping, handle the movement locally
+				if (player.isJumping) {
+					movePlayer(moveDirection, player.id);
+				} else {
+					// If the player is not jumping then send a move request to the server
+					String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
+					mainClient.connection.send(sendMe);	
+				}	        	
 			}
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		// Once a key has been released, stop keeping track of it's held-state
 		heldKeys.remove(new Integer(e.getKeyCode()));
 		if (e.getKeyCode() == KeyEvent.VK_SHIFT ) {
 			player.speed = Player.WALKING;
@@ -622,5 +644,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) { }
+	public void keyTyped(KeyEvent e) {
+		// Not used
+	}
 }
