@@ -3,8 +3,9 @@ package serverManagement;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -23,11 +24,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * 
  */
 public class ServerConnectionTable implements Runnable {
+	private static final int SERVER_QUEUE_SIZE = 1000;
 	private int nextUniqueId = 0;
 	private ServerSocket serverSocket;
 	private boolean initialized = false;
 	
-	private LinkedList<ServerQueuedMessage> incMessages = new LinkedList<ServerQueuedMessage>(); // combined received-action queue for all dataports
+	private BlockingQueue<ServerQueuedMessage> incMessages = new ArrayBlockingQueue<ServerQueuedMessage>(SERVER_QUEUE_SIZE); // combined received-action queue for all dataports
 	
 	/**
 	 * Vector of DataPorts, one for each client connected to the server.
@@ -108,7 +110,7 @@ public class ServerConnectionTable implements Runnable {
 	/**
 	 * @return the queue object used to store all incoming messages
 	 */
-	public LinkedList<ServerQueuedMessage> getIncMessageQueue() {
+	public BlockingQueue<ServerQueuedMessage> getIncMessageQueue() {
 		return incMessages;
 	}
 	
