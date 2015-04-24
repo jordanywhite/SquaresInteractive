@@ -2,7 +2,6 @@
 Networking Project
 
 ## Instructions
-* To view JUST the GUI, compile and run SquingGUI.java
 * To create a server that can host clients, run MainServer.java
 * To join the server and use the GUI to interact with the room, run MainClient.java
 	and be sure that MainServer.java is running.
