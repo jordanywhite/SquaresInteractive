@@ -1,4 +1,4 @@
-package squint;
+package squInt;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;

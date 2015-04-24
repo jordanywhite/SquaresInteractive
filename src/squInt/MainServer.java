@@ -1,4 +1,4 @@
-package squint;
+package squInt;
 
 import guiMap.Map;
 import guiMap.MapEditor;
