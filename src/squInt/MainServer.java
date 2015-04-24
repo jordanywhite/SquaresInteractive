@@ -9,16 +9,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-import actions.Action;
-import actions.PlayerAction;
 import player.Player;
 import resourceManagement.AvatarGroup;
 import resourceManagement.ResourceLoader;
 import serverManagement.DataPort;
 import serverManagement.ServerConnectionTable;
 import serverManagement.ServerQueuedMessage;
+import actions.Action;
+import actions.PlayerAction;
 
 /**
  * The server that hosts the interactive room.
@@ -58,7 +60,7 @@ public class MainServer {
 	private ServerConnectionTable serverTable = null;
 	
 	// holds the incoming message queue
-	private LinkedList<ServerQueuedMessage> serverQueue = null;
+	private BlockingQueue<ServerQueuedMessage> serverQueue = null;
 	
 	// The thread that listens for incoming connections to the server
 	private Thread serverTableThread;
@@ -78,29 +80,28 @@ public class MainServer {
 				// the id for this connection is nextId - 1;
 				mainServer.serverTable.sendToAll(playerInitMsg);
 				
-				// Every time somone connects, resend all player locations to all clients
-				for (String initMsg : mainServer.initMsgs) {
-					mainServer.serverTable.sendToAll(initMsg);
+				// Every time somone connects, resend all player locations to all clients	
+				Iterator<Integer> it = mainServer.players.keySet().iterator();
+				while (it.hasNext()) {
+					mainServer.serverTable.sendToAll(mainServer.generatePlayerInitMessage(it.next()));
 				}
 			}
 			
 			if(mainServer.serverQueue.peek() != null) {
 				// ServerQueuedMessage object just contains the source DataPort and the received String
-				ServerQueuedMessage sqm = mainServer.serverQueue.poll();
-				System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
-				
-				if (mainServer.requestAction(PlayerAction.parseFromMsg(sqm.message))) {
-					// send diff
-					mainServer.serverTable.sendToAll(sqm.message);
+				ServerQueuedMessage sqm = null;
+				try {
+					sqm = mainServer.serverQueue.poll(100, TimeUnit.MILLISECONDS);
+					System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
+					
+					if (mainServer.requestAction(PlayerAction.parseFromMsg(sqm.message))) {
+						// send diff
+						mainServer.serverTable.sendToAll(sqm.message);
+					}
+				} catch (InterruptedException e) {
+					System.out.println("ERROR: Server's receive queue was interrupted!");
 				}
-			}
-			
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
+			}			
 		}
 	}
 
@@ -183,6 +184,10 @@ public class MainServer {
 		changeMapOccupation(newPlayer.x, newPlayer.y, newPlayer.id, true);
 				
 		return generatePlayerInitMessage(newPlayer.id);
+	}
+	
+	public String clientAddUser(int playerId) {
+		return generatePlayerInitMessage(playerId);
 	}
 	
 	/**

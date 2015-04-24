@@ -6,3 +6,4 @@ init messages do not change so when new player/connection added, it's using the 
 send player facing-direction in INIT msgs
 when moving up or right with 2nd+ player, facing-direction is desynchronized b/w server and clients
 	NOTE: this could be because of init message crappiness
+Synchronizing issues between clients and server (interactions destabilize environment)

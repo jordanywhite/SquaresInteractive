@@ -21,8 +21,8 @@ public class MainClient {
 	/**
 	 * server IP we're connecting to
 	 */
-	private static final String ipAddr = "localhost";
-	//	private static final String ipAddr = "10.12.18.33";
+//	private static final String ipAddr = "localhost";
+		private static final String ipAddr = "10.12.18.80";
 
 	/**
 	 * The front end GUI attached to this client
