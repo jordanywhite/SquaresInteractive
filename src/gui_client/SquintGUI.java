@@ -60,18 +60,18 @@ public class SquintGUI extends JPanel implements KeyListener {
 	public static final int MAP_LEVEL = 0;	// Currently unimplemented
 	
 	// Toggle between AI mode and client mode
-	private final boolean AI_MODE = false;					
+//	private final boolean AI_MODE = false;					
 	// The list of ai players for triggering movements
 //	private Player[] ai_players;					
 	// The number of AI requested
-	private static final int NUM_AI_PLAYERS = 4;	
+//	private static final int NUM_AI_PLAYERS = 4;	
 	// The delay in ms between the AI movements
-	public static final int AI_MOVE_DELAY = 100; 		
+//	public static final int AI_MOVE_DELAY = 100; 		
 	// The delay in ms between terrain updates
 	public static final int TERRAIN_ANIMATION_DELAY = 200;	
 	
 	// The player
-	public Player player = null;
+	public Player player;
 	// The number of clients connected to the host
 	public int num_players = 0;		
 	// Used to keep track of keys that have not been released
@@ -176,17 +176,17 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param avatarName
 	 * @return
 	 */
-	public Player createPlayer(int playerId, String avatarName) {
+	public void createPlayer(int playerId, String avatarName) {
 		if (playerId > num_players) {
 			num_players = playerId;
 		}
 		player = new Player(avatarName, mapSquares, Player.Move.DOWN, true, playerId);		
 //		// Add the player to the list of players
-//		players.put(player.id, player);	
+		players.put(player.id, player);	
 		// Update the map to indicate the player "spawning"
 		changeMapOccupation(player.x, player.y, player.id, true);
 		// Return a reference to the player if needed
-		return player;
+//		return player;
 	}
 	
 	/**
@@ -248,15 +248,15 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new SquintGUI().initGUI();
+		new SquintGUI().initGUI(new SquintGUI());
 	}
 	
-	public void initGUI() {
+	public void initGUI(final SquintGUI gui) {
 		// Run GUI codes in the Event-Dispatching thread for thread safety
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame frame = new JFrame(TITLE);
-				frame.setContentPane(new SquintGUI());
+				frame.setContentPane(gui);
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setResizable(false);
 				frame.pack();             // "this" JFrame packs its components
@@ -434,7 +434,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Update the animated textures
 		drawAnimatedTerrain(g);
 		// Update the avatar textures
-		drawAvatars((Graphics2D) g, AI_MODE);
+		drawAvatars((Graphics2D) g, false);
 	}
 	
 	/**
@@ -705,7 +705,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (AI_MODE) return;
+//		if (AI_MODE) return;
 		if (!heldKeys.contains(e.getKeyCode())) {
 			heldKeys.add(new Integer(e.getKeyCode()));		
 		}
