@@ -49,54 +49,49 @@ public class SquintGUI extends JPanel implements KeyListener {
 
 	// Window title
 	public static final String TITLE = "Squares Interactive - SQUINT";
-			
+
 	// Size of the desktop client window
 	public static final int CANVAS_WIDTH = 800;		// the pixel width of the application window
 	public static final int CANVAS_HEIGHT = 800;	// the pixel height of the application window
-	
+
 	// Constants that define the level's characteristics
 	public static final int MAP_LAYERS = 4;	// The number of texture layers in the map
 	public static final int MAP_LEVEL = 0;	// Currently unimplemented
-	
+
 	public static final int TERRAIN_ANIMATION_DELAY = 200;	
-	
-	// The player
+
+	// The player attached to the client/GUI
 	public Player player;
 	// The number of clients connected to the host
 	public int num_players = 0;		
 	// Used to keep track of keys that have not been released
 	public List<Integer> heldKeys = new ArrayList<Integer>();	
-	
+
 	// the number of pixels per grid square
 	public static final int MAP_DIM = 40;				
-	
+
 	// The "background" image for the level - used so we only redraw moving parts
 	private BufferedImage roomBackgroundImage = null;
-	
+
 	// The entire level
 	Map level = null;
-	
+
 	// These are pointers to data in the 'level' variable
 	private MapSquare[][] mapSquares = null;
 	private MapSquare[] animatedSquares = null;
-	
+
 	// Resource loader
 	private ResourceLoader resLoad = null;
-	
+
 	// Texture Groups for the avatars
 	AvatarGroup avatars = null;
-	
-	// TEMP CLIENT-SERVER STUFF
-	// The "server" (not really)
-	PretendServer host = null;
+
 	// The "players connected to the server" (not really)
 	public HashMap<Integer, Player> players = null;
-	// The thread that waits for data from the host and processes it
-	Thread receiverThread = null;
-	String avatarName;	// Server will tell us what value this holds
-	MainClient mainClient;
-	// END TEMP CLIENT-SERVER STUFF
 
+	// The client attached to this GUI
+	MainClient mainClient;
+	
 	/** Constructor to setup the GUI components */
 	public SquintGUI(MainClient mainClient) 
 	{				
@@ -116,18 +111,18 @@ public class SquintGUI extends JPanel implements KeyListener {
 		roomBackgroundImage = makeImage(level.map.textures, level.map.coords);
 		// Create an avatar group for the players
 		avatars = new AvatarGroup(resLoad, "re");
-		
+
 		// Set up the client window
 		setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));		
 		addKeyListener(this);
-        setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
-        
+		setFocusable(true);
+		setFocusTraversalKeysEnabled(false);
+
 		// Set up the hashtable of players
 		players = new HashMap<Integer, Player>();
 		this.mainClient = mainClient;
 	}
-	
+
 	/**
 	 * This will be called when we receive an INIT_MSG from the server telling us
 	 * what our player ID is and what avatar to use
@@ -143,66 +138,23 @@ public class SquintGUI extends JPanel implements KeyListener {
 		if (this.player == null) {
 			this.player = player;
 		}
-//		// Add the player to the list of players
+		//		// Add the player to the list of players
 		players.put(player.id, player);	
 		// Update the map to indicate the player "spawning"
 		changeMapOccupation(player.x, player.y, player.id, true);
 		// Return a reference to the player if needed
-//		return player;
+		//		return player;
 	}
-	
+
 	/**
 	 * This sets up the room so we can draw it
 	 * 
 	 * @param level
 	 */
 	private void editLevel(MapEditor level) {
-		// This is the prototype ROOM level
+		// This is our room
 		level.makeRoom(6,3,14,16,"wood_floor","walls", "shadows");
-		// This is the prototype OUTSIDE level
-//		level.makeOutside(0,0,19,19, "grass","water",TERRAIN_ANIMATION_DELAY, "", "", new TerrainAnimator());
 	}
-	
-//	private void initAI() {
-//		// Go through and create the specified number of players
-//		for (int ai = 0; ai < NUM_AI_PLAYERS; ai++) 
-//		{				
-//			// Each AI is created in a random available location with a random avatar, facing a random direction
-//			Player aiPlayer = new Player(avatars.getRandomAvatar().name, mapSquares, (int)(Math.random()*4), true, num_players++);
-//			// If too many AI players were requested and there is no room, it will have a null avatar
-//			if (aiPlayer.avatarName == null) {
-//				break;
-//			}
-//			players.put(aiPlayer.id, aiPlayer);
-//			changeMapOccupation(aiPlayer.x, aiPlayer.y, aiPlayer.id, true);					
-//		}
-//		// Configure a timer to automatically move the AI players
-//		Timer autoMoveTimer = new Timer();
-//		autoMoveTimer.scheduleAtFixedRate(new TimerTask() {
-//			@Override
-//			public void run() {
-//				// Go through all ai players and make them move in a random direction
-//			    Iterator<Player> playerIterator = players.values().iterator();
-//			    while (playerIterator.hasNext()) {
-//			    	Player player = playerIterator.next();
-//			    	int moveDirection = (int)(Math.random()*4);
-//					if (player.allowedToMove) {
-//				        // Check if we are allowed to move
-//			        	if (host.lookIPressedSomethingCanIMove(moveDirection, player.id)) {
-//			        		// Let's move!
-//			        		// Simulate data being received from the host
-//			        		try {
-//								receivedDataBuffer.put(new Packet(moveDirection, player.id, Packet.PLAYER_DATA_FLAG));
-//							} catch (InterruptedException e1) {
-//								System.out.println("Couldn't simulate getting data from host");
-//							}
-//			    	        repaint();        		
-//			        	}
-//					}
-//			    }			
-//			}		
-//		}, 2000, AI_MOVE_DELAY);
-//	}
 
 	/**
 	 * Set up the client window
@@ -210,9 +162,8 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		new SquintGUI().initGUI(new SquintGUI());
 	}
-	
+
 	public void initGUI(final SquintGUI gui) {
 		// Run GUI codes in the Event-Dispatching thread for thread safety
 		SwingUtilities.invokeLater(new Runnable() {
@@ -227,7 +178,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 			}
 		});
 	}
-	
+
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -235,58 +186,7 @@ public class SquintGUI extends JPanel implements KeyListener {
   \  |
    \  \___________________________________________________________________________________________
 	\**                                                                                           **/	
-	
-//	// TEMP CLIENT-SERVER STUFF
-//	public final class Packet {
-//		public final int moveDirection;
-//		public final int playerId;
-//		public final int flags;
-//		
-//		public static final int PLAYER_DATA_FLAG = 0x01;
-//		
-//		public Packet(int direction, int playerId, int flags) {
-//			this.flags = flags;
-//			moveDirection = direction;
-//			this.playerId = playerId;			
-//		}
-//	}	
-//	public BlockingQueue<Packet> receivedDataBuffer = new ArrayBlockingQueue<Packet>(100);	
-//	public class Receiver implements Runnable {
-//		
-//		public final int POLL_TIMEOUT = 60;
-//		
-//		public Receiver() {	
-//			
-//		}
-//		
-//		@Override
-//		public void run() {
-//			while (true) {				
-//				System.out.println("WAIT: Waiting for data from the host...");
-//				Packet data = null;
-//				try {
-//					// Sit here and wait for data for at most POLL_TIMEOUT time
-//					data = receivedDataBuffer.poll(POLL_TIMEOUT, TimeUnit.MINUTES);
-//				} catch (InterruptedException e) {
-//					System.out.println("Error in receive buffer");
-////					e.printStackTrace();
-//				}
-//				// If there is no data, try again
-//				if (data == null) {
-//					System.out.println("TIMEOUT: Did not receive any data in " + POLL_TIMEOUT + " minutes. Closing connection.");
-//					// not really closing the connection, but kill the receiver
-//					return;
-//				}
-//				System.out.println("SUCCESS: Data received!");
-//				// If we have movement data, it's time to move
-//				if ((data.flags & Packet.PLAYER_DATA_FLAG) == Packet.PLAYER_DATA_FLAG) {
-//					movePlayer(data.moveDirection, players.get(data.playerId));				
-//				}
-//			}
-//		}		
-//	}
-//	// END TEMP CLIENT-SERVER STUFF
-	
+
 	/**
 	 * Handles player movement upon keyboard input
 	 * 
@@ -298,7 +198,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		Player player = players.get(playerId);
 		// A callable method so we can repaint during animation
 		PlayerAnimator aniUp = null;
-		
+
 		// Check if we are simply changing direction or animating
 		if (player.direction == direction) {
 			// See if we are moving instead of jumping
@@ -324,7 +224,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		MovePlayer.movePlayer(direction, player, aniUp);
 		repaint();
 	}
-	
+
 	/**
 	 * Update a map square to indicate whether it contains a player and if so
 	 * what is the player's ID
@@ -339,7 +239,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		mapSquares[playerY][playerX].playerId = occupied ? playerID : -1;
 		repaint();	// Update the GUI
 	}
-	
+
 	/**
 	 * Update the location of the player - called after completion
 	 * of the movement animation
@@ -359,7 +259,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		player.x = newLocation.x;
 		player.y = newLocation.y;
 	}
-	
+
 	/**
 	 * Figure out where the player would end up if they moved in
 	 * a direction
@@ -372,14 +272,15 @@ public class SquintGUI extends JPanel implements KeyListener {
 		Point newPoint = new Point(player.x, player.y);
 		Action action = PlayerAction.getActionFromInt(direction);
 		switch(action) {
-			case MOVE_RIGHT: newPoint.x++;	break;
-			case MOVE_UP:	newPoint.y--;	break;
-			case MOVE_LEFT:	newPoint.x--;	break;
-			case MOVE_DOWN:	newPoint.y++;	break;
+		case MOVE_RIGHT: newPoint.x++;	break;
+		case MOVE_UP:	newPoint.y--;	break;
+		case MOVE_LEFT:	newPoint.x--;	break;
+		case MOVE_DOWN:	newPoint.y++;	break;
+		case INTERACT:	break;
 		}
 		return newPoint;
 	}
-	
+
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -387,7 +288,7 @@ public class SquintGUI extends JPanel implements KeyListener {
   \  |
    \  \___________________________________________________________________________________________
 	\**                                                                                           **/	
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);  
@@ -398,7 +299,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Update the avatar textures
 		drawAvatars((Graphics2D) g, false);
 	}
-	
+
 	/**
 	 * This creates a static "background" image so we don't have to redraw the
 	 * entire map every time a GUI update is triggered
@@ -418,7 +319,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		g2.dispose();
 		return bImg;
 	}
-	
+
 	/**
 	 * Updates the application window to display the active map static background
 	 * 
@@ -431,14 +332,14 @@ public class SquintGUI extends JPanel implements KeyListener {
 			g.drawImage(roomBackgroundImage, 0, 0, this);
 		}
 	}
-	
+
 	private void drawAnimatedTerrain(Graphics g) {
 		if (animatedSquares == null) return;
 		for (MapSquare animatedSquare : animatedSquares) {
 			drawImageToGrid(level.map.animator.getCurrentPhaseTexture().textureFile, animatedSquare.col * MAP_DIM, animatedSquare.row * MAP_DIM, g, false, false);
 		}		
 	}
-	
+
 	/**
 	 * Draws the avatar(s) onto the map
 	 * 
@@ -447,8 +348,8 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 */
 	private void drawAvatars(Graphics2D g2d, boolean modeIsAI) {
 		// Draw each of the players in the list of players
-	    Iterator<Player> playerIterator = players.values().iterator();
-	    while (playerIterator.hasNext()) {
+		Iterator<Player> playerIterator = players.values().iterator();
+		while (playerIterator.hasNext()) {
 			drawPlayer(playerIterator.next(), g2d);	// Draw the player
 		}
 	}
@@ -476,7 +377,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 			}	
 		}
 	}
-	
+
 	/**
 	 * Draw an image onto the room
 	 * 
@@ -521,7 +422,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.drawImage(img, x_coord, y_coord, null);
 	}	
-	
+
 	/**
 	 * Make a larger copy of the original image
 	 * 
@@ -531,22 +432,22 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @return
 	 */
 	private Image resizeToBig(Image originalImage, int biggerWidth, int biggerHeight) {
-	    int type = BufferedImage.TYPE_INT_ARGB;
+		int type = BufferedImage.TYPE_INT_ARGB;
 
 
-	    BufferedImage resizedImage = new BufferedImage(biggerWidth, biggerHeight, type);
-	    Graphics2D g = resizedImage.createGraphics();
+		BufferedImage resizedImage = new BufferedImage(biggerWidth, biggerHeight, type);
+		Graphics2D g = resizedImage.createGraphics();
 
-	    g.setComposite(AlphaComposite.Src);
-	    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-	    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-	    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setComposite(AlphaComposite.Src);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-	    g.drawImage(originalImage, 0, 0, biggerWidth, biggerHeight, this);
-	    g.dispose();
+		g.drawImage(originalImage, 0, 0, biggerWidth, biggerHeight, this);
+		g.dispose();
 
 
-	    return resizedImage;
+		return resizedImage;
 	}
 
 	/**
@@ -606,7 +507,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 			drawImageToGrid(t.textureFile, player_x, player_y - MAP_DIM/2, g, false, true);
 		}
 	}
-	
+
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -614,7 +515,7 @@ public class SquintGUI extends JPanel implements KeyListener {
   \  |
    \  \___________________________________________________________________________________________
 	\**                                                                                           **/	
-	
+
 	/**
 	 * A callable that is used to update and redraw the level
 	 * during player animation
@@ -622,12 +523,12 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 */
 	public class PlayerAnimator implements Callable<Void> {
 		private Player player = null;
-		
+
 		// Call this before using .call()
 		public void setPlayer(Player player) {
 			this.player = player;			
 		}
-		
+
 		@Override
 		public Void call() throws Exception {
 			if (player != null) {
@@ -642,13 +543,13 @@ public class SquintGUI extends JPanel implements KeyListener {
 			return null;
 		}		
 	}
-	
+
 	/**
 	 * A callable used to redraw animated textures during animation
 	 *
 	 */
 	public class TerrainAnimator implements Callable<Void> {
-		
+
 		@Override
 		public Void call() throws Exception {
 			// REPAINT! and stand still no more.
@@ -656,7 +557,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 			return null;
 		}		
 	}
-	
+
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -667,62 +568,46 @@ public class SquintGUI extends JPanel implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-//		if (AI_MODE) return;
+		//		if (AI_MODE) return;
 		if (!heldKeys.contains(e.getKeyCode())) {
 			heldKeys.add(new Integer(e.getKeyCode()));		
 		}
 		if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-    		player.speed = Player.RUNNING;	
+			player.speed = Player.RUNNING;	
 		}
-    	if (player.allowedToMove) {
-    		int moveDirection = -1;
-	        if(heldKeys.contains(KeyEvent.VK_D) || heldKeys.contains(KeyEvent.VK_RIGHT)) {
-	        	moveDirection = Player.Move.RIGHT;
-	        } else if(heldKeys.contains(KeyEvent.VK_W) || heldKeys.contains(KeyEvent.VK_UP)) {
-	        	moveDirection = Player.Move.UP;
-	        } else if(heldKeys.contains(KeyEvent.VK_A) || heldKeys.contains(KeyEvent.VK_LEFT)) {
-	        	moveDirection = Player.Move.LEFT;
-	        } else if(heldKeys.contains(KeyEvent.VK_S) || heldKeys.contains(KeyEvent.VK_DOWN)) {
-	        	moveDirection = Player.Move.DOWN;
-	        } else if(heldKeys.contains(KeyEvent.VK_SPACE)) {
-	        	player.isJumping = true;
-	        	moveDirection = player.direction;
-	        } else if(heldKeys.contains(KeyEvent.VK_Q)) {
-	        	int modVal = Player.Move.RIGHT + 1;
-	        	moveDirection = ((((player.direction-1) % modVal) + modVal) % modVal);
-	        } else if(heldKeys.contains(KeyEvent.VK_E)) {
-	        	moveDirection = (player.direction + 1) % (Player.Move.RIGHT + 1);
-	        }
-	        
-	        if (moveDirection != -1) { 
-	        	String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
-	        	mainClient.connection.send(sendMe);	        	
-	        }
-	         
-	        
-	        // TODO this is where we send a move request to the server that includes our player.id and the moveDirection
-	        
-	        
-//	        // Check if we are allowed to move
-//        	if (moveDirection != -1 && host.lookIPressedSomethingCanIMove(moveDirection, player.id)) {
-//        		// Simulate move data being received from the host
-//        		try {
-//					receivedDataBuffer.put(new Packet(moveDirection, player.id, Packet.PLAYER_DATA_FLAG));
-//				} catch (InterruptedException e1) {
-//					System.out.println("Couldn't simulate getting data from host");
-//				}
-//        		// Update our GUI
-//    	        repaint();        		
-//        	}
+		if (player.allowedToMove) {
+			int moveDirection = -1;
+			if(heldKeys.contains(KeyEvent.VK_D) || heldKeys.contains(KeyEvent.VK_RIGHT)) {
+				moveDirection = Player.Move.RIGHT;
+			} else if(heldKeys.contains(KeyEvent.VK_W) || heldKeys.contains(KeyEvent.VK_UP)) {
+				moveDirection = Player.Move.UP;
+			} else if(heldKeys.contains(KeyEvent.VK_A) || heldKeys.contains(KeyEvent.VK_LEFT)) {
+				moveDirection = Player.Move.LEFT;
+			} else if(heldKeys.contains(KeyEvent.VK_S) || heldKeys.contains(KeyEvent.VK_DOWN)) {
+				moveDirection = Player.Move.DOWN;
+			} else if(heldKeys.contains(KeyEvent.VK_SPACE)) {
+				player.isJumping = true;
+				moveDirection = player.direction;
+			} else if(heldKeys.contains(KeyEvent.VK_Q)) {
+				int modVal = Player.Move.RIGHT + 1;
+				moveDirection = ((((player.direction-1) % modVal) + modVal) % modVal);
+			} else if(heldKeys.contains(KeyEvent.VK_E)) {
+				moveDirection = (player.direction + 1) % (Player.Move.RIGHT + 1);
+			}
+
+			if (moveDirection != -1) { 
+				String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
+				mainClient.connection.send(sendMe);	        	
+			}
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		heldKeys.remove(new Integer(e.getKeyCode()));
-    	if (e.getKeyCode() == KeyEvent.VK_SHIFT ) {
-    		player.speed = Player.WALKING;
-    	}
+		if (e.getKeyCode() == KeyEvent.VK_SHIFT ) {
+			player.speed = Player.WALKING;
+		}
 	}
 
 	@Override

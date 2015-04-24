@@ -3,9 +3,7 @@ package squInt;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,6 +15,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Received messages are stored in a queue. getIncMessageQueue() returns
  * a direct link to the queue object. Use the object's poll() method to
  * pop the next message off the front of the queue.
+ * 
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
+ * 
  */
 public class ServerConnectionTable implements Runnable {
 	private int nextUniqueId = 0;
@@ -128,26 +132,6 @@ public class ServerConnectionTable implements Runnable {
 	 */
 	public int getNumConnections() {
 		return connections.size();
-	}
-
-	public void checkForExistingServer() {
-		// TODO: use multicast to look for an existing server and connect to it
-
-		//		try {
-		//			// use multicast to see if another server is looking for clients
-		//			DatagramSocket socket = new DatagramSocket(PORT);
-		//
-		//			String message = "SI#Init";
-		//			byte[] buf = message.getBytes();
-		//
-		//			// send it
-		//			InetAddress group = InetAddress.getByName("230.0.0.1");
-		//			DatagramPacket packet = new DatagramPacket(buf, buf.length, group, PORT);
-		//			socket.send(packet);
-		//
-		//		} catch (IOException e) {
-		//			e.printStackTrace();
-		//		}
 	}
 	
 	private class NewConnectionListener implements Runnable {

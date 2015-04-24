@@ -1,31 +1,50 @@
 package squInt;
 
 /**
+ * PlayerAction
+ * 
  * pairs an action with a playerId. This will get converted into a
  * string (helper methods are here to encode/decode) and sent over the
  * network
+ * 
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
  *
  */
 public class PlayerAction {
-	public int playerId;
+	public int playerId; 
 	public Action action;
 	
-//	public int direction;
+	/** 
+	 * constructor
+	 * 
+	 * @param playerId player producing action
+	 * @param action direction player is moving
+	 */
 	public PlayerAction(int playerId, Action action) {
 		this.playerId = playerId;
 		this.action = action;
 	}
 	
+	/**
+	 * generateActionMessage - creates server message
+	 *  
+	 * @param playerId
+	 * @param actionInt
+	 * @return message
+	 */
 	public static String generateActionMessage(int playerId, int actionInt) {
-//		int actionNum = getActionNum(action);
-//		
-//		if(actionNum == -1) {
-//			return null;
-//		}
-//		
 		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionInt;
 	}
 	
+	/**
+	 * converts string message to valid player action.
+	 * 
+	 * @param msg message to parse
+	 * @return parsed packet
+	 */
 	public static PlayerAction parseFromMsg(String msg) {
 		if(!isValidMessage(msg)) {
 			return null;
@@ -74,6 +93,8 @@ public class PlayerAction {
 
 		return true;
 	}
+	
+	// getter methods //
 	
 	public static int getActionNum(Action a) {
 		switch(a) {

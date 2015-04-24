@@ -16,6 +16,11 @@ import java.util.concurrent.BlockingQueue;
  * Received messages are stored in a queue. getIncMessageQueue() returns
  * a direct link to the queue object. Use the object's poll() method to
  * pop the next message off the front of the queue.
+ * 
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
  */
 public class DataPort implements Runnable {
 	// message types

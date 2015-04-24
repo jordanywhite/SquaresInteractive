@@ -8,6 +8,7 @@ package gui_client;
  */
 
 public class MapTangle {
+	
 		// Dimensions of the rectangle floor
 		public final int startRow;
 		public final int startCol;
@@ -95,9 +96,7 @@ public class MapTangle {
 		public final class WallShadow {
 			
 			public final ShadowWallStruct left;
-//			public final ShadowWallStruct right;
 			public final ShadowWallStruct top;
-//			public final ShadowWallStruct bottom;
 			
 			public WallShadow() {
 				// Set wall shadow dimensions		
@@ -108,9 +107,6 @@ public class MapTangle {
 		
 		public final class CornerShadow {
 			public final ShadowCornerStruct topLeft;
-//			public final ShadowCornerStruct topRight;
-//			public final ShadowCornerStruct botLeft;
-//			public final ShadowCornerStruct botRight;
 			
 			public CornerShadow() {
 				// Set corner shadow dimensions		

@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 
 /**
  * 
+ * Compresses image/texture files to be used in the room.
  * 
  * @author Caleb Piekstra
  *

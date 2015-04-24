@@ -16,18 +16,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * The User object for the server.
+ * The server that hosts the interactive room.
  *
+ * @author Kai Jorgensen
+ * @author Bryce Matsuda
+ * @author Caleb Piekstra
+ * @author Jordan White
  */
 public class Server {
 
 	public static final int MAX_CLIENTS = 32;
 	public static final int SERVER_ID = 0;
-
-	/*
-	 * Convenient way to know where everyone is for the server
-	 */
-	private int[][] idPos;
 
 	/*
 	 * The id to be assigned to the next client
@@ -62,20 +61,6 @@ public class Server {
 	public static void main(String[] args) {
 		/** TO RUN: run MainServer and then run MainClient numConnections times **/
 		Server server = new Server();
-
-		
-//		// wait until this many connections are established
-//		while(currentNumConnections < totalConnections) {
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-		
-		// send message to all
-//		System.out.println("SERVER SENDING TO ALL: \"Snotty trails?\"");
-//		server.serverTable.sendToAll("Snotty trails?");
 		
 		// now have server just wait for inc messages and print them (until program is terminated)
 		while(true) {
@@ -114,6 +99,9 @@ public class Server {
 		}
 	}
 
+	/**
+	 * constructor
+	 */
 	public Server() {		
 		// Generate (unfortunately) a lot of data but only save the meta data
 		generateMetaData();
@@ -133,14 +121,21 @@ public class Server {
 	}
 	
 
-	
+	/**
+	 *  creates a server message that broadcasts a new user connection
+	 *  
+	 * @param playerId the connecting player
+	 * @return the new server message
+	 */
 	public String generatePlayerInitMessage(int playerId) {				
 		return "SI#" + DataPort.INIT_MSG + "#" + playerId 
 				+ "@" + players.get(playerId).avatarName 
 				+ "@" + players.get(playerId).x 
 				+ "@" + players.get(playerId).y;
 	}
-	
+	/**
+	 * generateMetaData - initialize server meta data
+	 */
 	private void generateMetaData() {
 		// Create a resource loader so we can get textures
 		ResourceLoader resLoad = new ResourceLoader();		
@@ -160,32 +155,6 @@ public class Server {
 			avatarNames[idx++] = avatarName;
 		}
 		players = new HashMap<Integer, Player>();
-	}
-
-	/**
-	 * getPlayerPos retreive x and y position for a player in a point
-	 * 
-	 * @param id
-	 *            the client
-	 * @return a point with the x and y pos of a player, or null if id is unused
-	 */
-	public Point getPlayerPos(int id) {
-		for (int j = 0; j < Room.HEIGHT; j++) {
-			for (int i = 0; i < Room.WIDTH; i++) {
-				if (idPos[i][j] == id) {
-					return new Point(i, j);
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * getMapSquares The one map to rule them all
-	 * 
-	 */
-	public MapSquare[][] getMapSquares() {
-		return this.mapSquares;
 	}
 
 	/**
@@ -211,6 +180,11 @@ public class Server {
 		return generatePlayerInitMessage(newPlayer.id);
 	}
 	
+	/**
+	 * Helper method for finding a random position to place the user
+	 * 
+	 * @return the new location
+	 */
 	private Point findLocationForPlayer() {
 		Point spawnHere = new Point();
 		// Pick a pseudorandom location to place the player based on the given map
@@ -259,11 +233,16 @@ public class Server {
 		changeMapOccupation(removeThisGuy.x, removeThisGuy.y, -1, false);
 		players.remove(id);
 		
-		// At this point we would broadcast removing the player? TODO
+		// TODO: At this point we would broadcast removing the player?
 		
 		return true;
 	}
 	
+	/**
+	 * addUser - adds a user to the player list
+	 * 
+	 * @param player the player to add
+	 */
 	public void addUser(Player player) {
 		players.put(player.id, player);
 	}
@@ -316,7 +295,6 @@ public class Server {
 		
 		int moveDirection = PlayerAction.getActionNum(playerAction.action);		
 
-
 		// TODO BROADCAST THE MOVE (DIFF) TO ALL CONNECTED CLIENTS
 		return isValidMove(moveDirection, playerId);
 	}
@@ -354,6 +332,12 @@ public class Server {
 		return false;
 	}
 	
+	/**
+	 * updatePlayerPosition - updates a players position to a given point
+	 * 
+	 * @param newPoint the new position
+	 * @param playerId the player to move to this new position
+	 */
 	private void updatePlayerPosition(Point newPoint, int playerId) {
 		Player player = players.get(playerId);
 		player.x = newPoint.x;
@@ -396,6 +380,7 @@ public class Server {
 			case MOVE_UP:	newPoint.y--;	break;
 			case MOVE_LEFT:	newPoint.x--;	break;
 			case MOVE_DOWN:	newPoint.y++;	break;
+			case INTERACT:	break;
 		}
 		return newPoint;
 	}
