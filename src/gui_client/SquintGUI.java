@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import squInt.Action;
 import squInt.MainClient;
 import squInt.PlayerAction;
 
@@ -310,10 +311,6 @@ public class SquintGUI extends JPanel implements KeyListener {
 				if (destinationSquare == null) {
 					return;
 				}
-				// Ask for permission to move - host must claim the destination map square if client allowed to move
-				if(!MoveRequest.canIMoveHere(destinationSquare, newSquareLoc, level.mapCols, level.mapRows)) {
-					return;
-				}
 				// Get the location where the player will be located but don't actually 
 				// update the player's location - the old one needs to be maintained for
 				// the duration of the movement animation
@@ -373,11 +370,12 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 */
 	private Point getNewPlayerPosition(Player player, int direction){
 		Point newPoint = new Point(player.x, player.y);
-		switch(direction) {
-			case Player.Move.RIGHT: newPoint.x++;	break;
-			case Player.Move.UP:	newPoint.y--;	break;
-			case Player.Move.LEFT:	newPoint.x--;	break;
-			case Player.Move.DOWN:	newPoint.y++;	break;
+		Action action = PlayerAction.getActionFromInt(direction);
+		switch(action) {
+			case MOVE_RIGHT: newPoint.x++;	break;
+			case MOVE_UP:	newPoint.y--;	break;
+			case MOVE_LEFT:	newPoint.x--;	break;
+			case MOVE_DOWN:	newPoint.y++;	break;
 		}
 		return newPoint;
 	}

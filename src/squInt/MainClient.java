@@ -72,29 +72,7 @@ public class MainClient {
 		Thread receiverThread = new Thread(client.new Receiver());
 		receiverThread.start();
 		
-		//connection.send("SI#" + DataPort.INIT_MSG);
-		
-		
-		
-//		
-//		// wait until we receive a message
-//		String msg = null;
-//		while (msg == null) {
-//			try {
-//				// Wait for the message
-//				msg = incMsgQueue.poll(QUEUE_TIMEOUT, TimeUnit.MINUTES);
-//			} catch (InterruptedException e) {				
-//				e.printStackTrace();
-//			}			
-//		}
-//		
-//		// print the message!
-//		// poll() also removes it from the queue
-//		System.out.println("RCVD: " + msg);
-//		
-//		// send a response
-//		connection.send("Trails indeed!");
-//		System.out.println("SENT: Trails indeed!");
+		//connection.send("SI#" + DataPort.INIT_MSG);	
 		
 	}
 	
@@ -157,12 +135,6 @@ public class MainClient {
 				if (playerAction != null) {
 					gui.movePlayer(PlayerAction.getActionNum(playerAction.action), playerAction.playerId);
 				}
-				
-				// If we have movement data, it's time to move
-				// TODO
-//				if () {
-//					gui.movePlayer(direction, player);			
-//				}
 			}
 		}		
 	}

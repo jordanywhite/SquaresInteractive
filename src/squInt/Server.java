@@ -206,7 +206,7 @@ public class Server {
 			return null;
 		}
 		addUser(newPlayer);
-		updateMap(mapSquares[newPlayer.y][newPlayer.x], newPlayer.id);
+		changeMapOccupation(newPlayer.x, newPlayer.y, newPlayer.id, true);
 				
 		return generatePlayerInitMessage(newPlayer.id);
 	}
@@ -335,6 +335,7 @@ public class Server {
 		// Check if the player is simply rotating in place
 		if (moveDirection != players.get(playerId).direction) {
 			// Player is rotating in place, they can do that all they want
+			players.get(playerId).direction = moveDirection;
 			return true;
 		}
 		// Get the coordinates of the destination square based on the move direction
@@ -344,11 +345,19 @@ public class Server {
 		// Check if the destination square is occupied or SOLID
 		if (!destSquare.isOccupied && !destSquare.sqType.equals(MapSquare.SquareType.SOLID)) {
 			// Update the map to indicate the new location
-			updateMap(destSquare, playerId);
+			updateMap(destSquare, playerId);	
+			// Update the player to be in a new position
+			updatePlayerPosition(destSquarePoint, playerId);
 			// Square is available to be moved into, let the player know they can move
 			return true;
 		}
 		return false;
+	}
+	
+	private void updatePlayerPosition(Point newPoint, int playerId) {
+		Player player = players.get(playerId);
+		player.x = newPoint.x;
+		player.y = newPoint.y;		
 	}
 	
 	/**
@@ -368,7 +377,7 @@ public class Server {
 		oldSquare.playerId = -1;
 		// Set the new square
 		destSquare.playerId = playerId;
-		destSquare.isOccupied = true;
+		destSquare.isOccupied = true;		
 	}
 	
 	/**
@@ -381,11 +390,12 @@ public class Server {
 	 */
 	private Point getNewPlayerPosition(Player player, int direction){
 		Point newPoint = new Point(player.x, player.y);
-		switch(direction) {
-			case Player.Move.RIGHT: newPoint.x++;	break;
-			case Player.Move.UP:	newPoint.y--;	break;
-			case Player.Move.LEFT:	newPoint.x--;	break;
-			case Player.Move.DOWN:	newPoint.y++;	break;
+		Action action = PlayerAction.getActionFromInt(direction);
+		switch(action) {
+			case MOVE_RIGHT: newPoint.x++;	break;
+			case MOVE_UP:	newPoint.y--;	break;
+			case MOVE_LEFT:	newPoint.x--;	break;
+			case MOVE_DOWN:	newPoint.y++;	break;
 		}
 		return newPoint;
 	}
