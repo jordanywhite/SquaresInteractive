@@ -1,0 +1,3 @@
+fix moving down
+remove player when someone disconnects
+fix sending init player position to client
