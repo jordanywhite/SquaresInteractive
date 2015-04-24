@@ -31,7 +31,7 @@ public class MainClient {
 		
 		// Set up the GUI for the client
 		client.gui = new SquintGUI();
-		client.gui.initGUI();
+		client.gui.initGUI(client.gui);
 		
 		// TODO I am not sure if this already happens, but we 
 		// should keep trying to connect if the connection fails 
@@ -41,7 +41,7 @@ public class MainClient {
 				connection = new DataPort(ipAddr, 9999);
 				// If a connection could not be established, wait a little and try again
 				if (connection == null) {	
-					Thread.sleep(100);
+					Thread.sleep(1000);
 					continue;
 				}
 				// set the queue to point to the DataPort's queue
@@ -120,7 +120,9 @@ public class MainClient {
 				// TODO
 				
 				// Let's pretend we get data from the host and it is an INIT_MSG
-				gui.createPlayer(0, "glasses");
+				if (gui.player == null) {
+					gui.createPlayer(0, "glasses");
+				}
 				
 				// If we have an UPDATE_MSG, update map so that the specified player is at the specified location
 				// TODO
