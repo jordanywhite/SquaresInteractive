@@ -47,37 +47,7 @@ public class Player {
 	// Resources
 	public ResourceLoader resources = null;
 	
-	public Player(String avatarName, MapSquare[][] sq, int direction, boolean canIMove, int playerIdx) {
-		// Pick a pseudorandom location to place the player based on the given map
-		Integer[] numRows = new Integer[sq.length];
-		for (int i = 0; i < numRows.length; i++) {
-			numRows[i] = i;
-		}
-		Collections.shuffle(Arrays.asList(numRows));	// Get a random ordering of valid rows
-		boolean foundSpot = false;
-		// Go through each row until we find a row with an open spot for a player
-		findSpotLoop:
-		for (int row : numRows) {
-			Integer[] numCols = new Integer[sq[row].length];
-			for (int i = 0; i < numCols.length; i++) {
-				numCols[i] = i;
-			}
-			Collections.shuffle(Arrays.asList(numCols));	// Get a random ordering of valid rows
-			for (int col : numCols) {
-				// Make sure the square isn't solid
-				if (sq[row][col].sqType != MapSquare.SquareType.SOLID && sq[row][col].isOccupied == false) {
-					foundSpot = true;
-					x = col;
-					y = row;
-					break findSpotLoop;
-				}
-			}
-		}
-		if (!foundSpot) {
-			System.out.println("No room for player number: " + playerIdx);
-			return;
-		}
-
+	public Player(String avatarName, int direction, boolean canIMove, int playerIdx, int x, int y) {
 		// If the direction was incorrect, set it to be a default DOWN direction
 		if (direction > Move.RIGHT || direction < Move.DOWN) {
 			this.direction = Move.DOWN;
@@ -90,6 +60,8 @@ public class Player {
 		allowedToMove = canIMove;
 		inAnimationPhase = false;
 		isJumping = false;
+		this.x = x;
+		this.y = y;
 		// Set the avatar last, if we couldn't create a player then it will have a null avatar
 		this.avatarName = avatarName;
 	}

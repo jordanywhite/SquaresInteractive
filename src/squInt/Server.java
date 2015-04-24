@@ -10,6 +10,8 @@ import gui_client.SquintGUI;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -197,7 +199,8 @@ public class Server {
 	public String registerUser() {
 		// Increment the user id for the next user and return the id we used for
 		// this user
-		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], mapSquares, Player.Move.DOWN, true, nextId++);
+		Point putThemHere = findLocationForPlayer();
+		Player newPlayer = new Player(avatarNames[(int)(Math.random() * avatarNames.length)], Player.Move.DOWN, true, nextId++, putThemHere.x, putThemHere.y);
 		if (newPlayer.avatarName == null) {
 			// failed to create user?
 			return null;
@@ -206,6 +209,39 @@ public class Server {
 		updateMap(mapSquares[newPlayer.y][newPlayer.x], newPlayer.id);
 				
 		return generatePlayerInitMessage(newPlayer.id);
+	}
+	
+	private Point findLocationForPlayer() {
+		Point spawnHere = new Point();
+		// Pick a pseudorandom location to place the player based on the given map
+		Integer[] numRows = new Integer[mapSquares.length];
+		for (int i = 0; i < numRows.length; i++) {
+			numRows[i] = i;
+		}
+		Collections.shuffle(Arrays.asList(numRows));	// Get a random ordering of valid rows
+		boolean foundSpot = false;
+		// Go through each row until we find a row with an open spot for a player
+		findSpotLoop:
+		for (int row : numRows) {
+			Integer[] numCols = new Integer[mapSquares[row].length];
+			for (int i = 0; i < numCols.length; i++) {
+				numCols[i] = i;
+			}
+			Collections.shuffle(Arrays.asList(numCols));	// Get a random ordering of valid rows
+			for (int col : numCols) {
+				// Make sure the square isn't solid
+				if (mapSquares[row][col].sqType != MapSquare.SquareType.SOLID && mapSquares[row][col].isOccupied == false) {
+					foundSpot = true;
+					spawnHere.x = col;
+					spawnHere.y = row;
+					break findSpotLoop;
+				}
+			}
+		}
+		if (!foundSpot) {
+			System.out.println("No room for player number: " + (nextId - 1));
+		}
+		return spawnHere;
 	}
 
 	/**

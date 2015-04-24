@@ -134,11 +134,11 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param avatarName
 	 * @return
 	 */
-	public void createPlayer(int playerId, String avatarName) {
+	public void createPlayer(int playerId, String avatarName, int x, int y) {
 		if (playerId > num_players) {
 			num_players = playerId;
 		}
-		Player player = new Player(avatarName, mapSquares, Player.Move.DOWN, true, playerId);
+		Player player = new Player(avatarName, Player.Move.DOWN, true, playerId, x, y);
 		if (this.player == null) {
 			this.player = player;
 		}
@@ -149,13 +149,6 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Return a reference to the player if needed
 //		return player;
 	}
-
-	public void createPlayer(int playerId, String avatarName, int x, int y) {
-		createPlayer(playerId, avatarName);
-		changeMapOccupation(player.x, player.y, player.id, false);
-		
-		changeMapOccupation(x, y, player.id, true);
-	}	
 	
 	/**
 	 * This sets up the room so we can draw it
