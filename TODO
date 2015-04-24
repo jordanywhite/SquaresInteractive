@@ -1,3 +1,6 @@
 fix moving down
 remove player when someone disconnects
 fix sending init player position to client
+if client jumps, server thinks they're moving (temp fix by disabling spacebar?)
+update server player position on move request (currently server position never changes)
+send player facing-direction in INIT msgs
