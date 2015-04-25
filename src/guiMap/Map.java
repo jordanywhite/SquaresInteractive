@@ -31,15 +31,15 @@ public class Map {
 	// Map Constants
 	
 	// Map Attributes
-	public int mapId;
-	public int mapWidth;		// In textures squares
-	public int mapHeight;		// In textures squares
+	public int mapId;			// The ID of the map (not used)
+	public int mapWidth;		// Logical width of the map (number of tiles across)
+	public int mapHeight;		// Logical height of the map (number of tiles down)
 	public int mapLayers;		// Number of layers of the textures (Image layers)
 	public int mapSquareDim;	// Size of a map square (in pixels)
 	public int mapRows;			// The number of logical rows in the map (mapHeight / mapSquareDim)
 	public int mapCols;			// The number of logical columns in the map (mapWidth / mapSquareDim)
 		
-	// Wall 
+	// A Wall (used for textures)
 	public static class Wall { 
 		public static final String LEFT = "left";
 		public static final String RIGHT = "right";
@@ -50,6 +50,8 @@ public class Map {
 			this.wall = wall;
 		}
 	}
+	
+	// A Wall's shadow (used for textures)
 	public static class WallShadow extends Wall { 
 		public String wallShadow;
 		public WallShadow(String wallShadow) {
@@ -57,6 +59,8 @@ public class Map {
 			this.wallShadow = super.wall;
 		}
 	}
+	
+	// A Wall corner (used for textures)
 	public static class Corner { 
 		public static final String BOT_LEFT = "q1";
 		public static final String BOT_RIGHT = "q2";
@@ -67,6 +71,8 @@ public class Map {
 			this.corner = corner;
 		}
 	}
+	
+	// A Wall corner's shadow (used for textures)
 	public static class CornerShadow extends Corner{ 
 		public String cornerShadow;
 		public CornerShadow(String cornerShadow) {
@@ -74,7 +80,8 @@ public class Map {
 			this.cornerShadow = super.corner;
 		}
 	}
-	
+
+	// A Wall corner attribute (used for textures)
 	public static class CornerSize { 
 		public static final String LARGE = "large";
 		public static final String SMALL = "small";
@@ -84,7 +91,7 @@ public class Map {
 		}
 	}
 	
-	// Map Layer Variables
+	// Map Layer Variables - what to draw first (lower level is drawn first)
 	// These layers are not strict, so a wall could be added to a shadow layer for example
 	public final class MapLayer { 
 		public static final int TRANSPARENT = 0;
@@ -97,7 +104,8 @@ public class Map {
 			this.layer = layer;
 		}
 	} 
-	// Used to store a ratio of normal to unique (the first half of a texture group is considered the normal half)
+	
+	// Used to store a ratio of normal to unique (used for textures)
 	public final class Seed {
 		public final double normPercent;
 		public final double specPercent;
@@ -107,7 +115,8 @@ public class Map {
 			specPercent = special/total;
 		}
 	}	
-	
+
+	// Used to store a ratio of two items (used for textures)
 	public final class Ratio {
 		public final double item1;
 		public final double item2;
@@ -117,18 +126,28 @@ public class Map {
 			item2 = i2/total;
 		}
 	}
-	// Map Textures
+	
+	// All textures available to the Map for drawing
 	public HashMap<String, TextureGroup> textures = null;	
-	// Resources
+	
+	// A resource loader, used to bring in textures for the map to play with
 	public ResourceLoader resources = null;
-	// A map array (just a 3d string)
+	
+	// A level, contains map attributes, texture locations, meta data, animation data, etc.
 	public final class Level {
 		public final Texture[][][] textures;	// Holds textures for all layers and squares of the map
 		public final Point[][] coords;			// Holds the pixel coordinates for all map squares
 		public final MapSquare[][] squares;		// Holds the characteristics for all map squares
-		public MapSquare[] animatedSquares;	// A 1D array of all the animated map squares
-		public Animators.TerrainAnimation animator;
+		public MapSquare[] animatedSquares;		// A 1D array of all the animated map squares
+		public Animators.TerrainAnimation animator;	// The map's terrain animator - syncs animations
 		
+		/**
+		 * The Level constructor
+		 * 
+		 * @param map	A 3D array of textures (2D with layers)
+		 * @param p		A 2D array of points (defines tiles)
+		 * @param ms	A 2D array of map squares (map's meta data)
+		 */
 		public Level(Texture[][][] map, Point[][] p, MapSquare[][] ms) {
 			this.textures = map;
 			this.coords = p;
@@ -136,48 +155,73 @@ public class Map {
 			this.animator = null;
 		}
 	}
-	// The map
+	
+	// The map itself
 	public Level map = null;
 	
 	/**
-	 * Maps must be rectangular
 	 * 
 	 * @param map_id
-	 * @param map_width		number of textures squares across
-	 * @param map_height	number of textures squares down
+	 * @param map_width		
+	 * @param map_height	
+	 * @param num_layers	
+	 */
+	/**
+	 * Maps must be rectangular
+	 * 
+	 * @param resLoader		where we get our textures
+	 * @param map_id		the ID of the map
+	 * @param map_width		pixel width of the map
+	 * @param map_height	pixel height of the map
 	 * @param num_layers	how many texture layers in the map
+	 * @param squareDim		the dimension of a map square (in pixels)
 	 */
 	public Map(ResourceLoader resLoader, int map_id, int map_width, int map_height, int num_layers, int squareDim) {
-		resources = resLoader;
+
 		// Set values that will act like constants for the textures
+		resources = resLoader;		
 		mapId = map_id;
 		mapWidth = map_width;
 		mapHeight = map_height;
 		mapLayers = num_layers;
 		mapSquareDim = squareDim;
-		mapRows = mapHeight / mapSquareDim;
-		mapCols = mapWidth / mapSquareDim;
+		mapRows = mapHeight / mapSquareDim;	// logical rows (not in pixels)
+		mapCols = mapWidth / mapSquareDim;	// logical cols (not in pixels)
 		
 		// Load all files with a '.png' extension that aren't in the 'avatars' group
-		loadFiles(".png", new String[] {"avatars"});	
-		// Load the file groups from our file loader into our hashtable of texture groups
-		// exclude groups we do not want
-		map = generateBlankMap(mapLayers, mapRows, mapCols);	
+		loadFiles(".png", new String[] {"avatars"});
+		
+		// Create a blank map using our logical dimensions
+		map = generateBlankMap(mapLayers, mapRows, mapCols);
+		
+		// Add a layer of "transparent" images to the map (outside-the-map fog)
 		addTransparentLayer(map, MapLayer.TRANSPARENT);
 	}
 
+	/**
+	 * Loads texture files with a certain file type and that are not a part
+	 * of one of the excluded groups
+	 * 
+	 * @param fileType			The image file extension, i.e. ".png"
+	 * @param excludedGroups	The groups (directories) that we want to exclude from our load
+	 */
 	private void loadFiles(String fileType, String[] excludedGroups) {
+		
 		// Initialize the textures map
 		textures = new HashMap<String, TextureGroup>();
+		
 		// Get all the directories that are not in an excluded group
 		ArrayList<File> dirFiles = resources.getAllDirsExcluding(excludedGroups);
+		
 		// Create a list to hold the paths for the directories
 		ArrayList<String> dirPaths = new ArrayList<String>();
 		for (File file : dirFiles) {
 			dirPaths.add(file.getAbsolutePath());
 		}
 		
-		int textureCount = 0;	// Count how many textures were loaded
+		// Count how many textures were loaded
+		int textureCount = 0;	
+		
 		// Go through every directory and create a texture group for it
 		for(String dir : dirPaths) {
 			// If the directory is an excluded group or a sub-directory of 
@@ -194,34 +238,68 @@ public class Map {
 				textureCount++;
 			}			
 		}
+		
 		System.out.println("Map loaded with " + textureCount + " texture groups.");
 	}
 	
-	private Level generateBlankMap(int layers, int rows, int cols) {		
+	/**
+	 * Creates a blank map using logical map dimensions
+	 * 
+	 * @param layers	The number of logical texture layers 	(the z-axis)
+	 * @param rows		The number of logical rows 				(the y-axis)
+	 * @param cols		The number of logical cols 				(the x-axis)
+	 * @return	The newly generated map
+	 */
+	private Level generateBlankMap(int layers, int rows, int cols) {
+		
+		// Initialize an array to hold the physical coordinates of each map square (tile)
 		Point[][] coords = new Point[rows][cols];
+		
+		// Initialize the map's meta data array
 		MapSquare[][] squares = new MapSquare[rows][cols];
+		
+		// Loop through and initialize each entry in our arrays
 		for (int row = 0, rowPoint = 0; row < rows; row++, rowPoint += mapSquareDim) {
 			for (int col = 0, colPoint = 0; col < cols; col++, colPoint += mapSquareDim ) {
-				coords[row][col] = new Point(colPoint, rowPoint);				
+				
+				// Create the physical (pixel) coordinates
+				coords[row][col] = new Point(colPoint, rowPoint);		
+				
+				// Create a map square with default values
 				squares[row][col] = new MapSquare(MapSquare.SquareType.UNDEF, false, -1, row, col);
 				
 			}
 		}
+		// Create a new level using a blank texture array and the initialized coordinate and meta data arrays
 		return new Level(new Texture[layers][rows][cols], coords, squares);
 	}
 	
+	/**
+	 * Goes through a layer of the map and add's a transparent texture to each square (tile)
+	 * 
+	 * @param map	The map to add the layer to
+	 * @param layer	Which layer of the map to add the layer
+	 */
 	private void addTransparentLayer(Level map, int layer) {
+		
+		// This holds the transparent texture
 		Texture transparentTexture = null;
+		
+		// Look for the file in the "misc" folder
 		for (Texture t : textures.get("misc").textures.values()) {
 			if (t.textureFile.getName().contains("transparent")) {
 				transparentTexture = t;
 				break;
 			}
 		}
+		
+		// If the transparent texture was not found, leave the method
 		if (transparentTexture == null) {
 			System.out.println("ERROR: No transparent file found for transparent map layer");
 			return;
 		}
+		
+		// Go through each map square at the specified layer and set the texture to be transparent
 		for (int row = 0; row < mapRows; row++) {
 			for (int col = 0; col < mapCols; col++) {
 				map.textures[layer][row][col] = transparentTexture;
@@ -229,17 +307,28 @@ public class Map {
 		}
 	}
 	
-	// Sets the type of each square in the map to SOLID or EMPTY
+	/**
+	 * Sets the type of each square in a map to SOLID or EMPTY, 
+	 * allows for exceptions
+	 * 
+	 * @param map			The map whose squares will be set
+	 * @param solids		Which texture groups have textures which should be SOLID
+	 * @param exceptions	Textures within a texture group of SOLIDs that should not be SOLID
+	 */
 	public void setMapSquareTypes(Level map, String[] solids, String[] exceptions) {
+		
 		// Used to determine if a map square should be set as solid
 		boolean isSolid = false;
+		
 		// If a square only has a texture on the transparent layer, then it is also a solid
-		for (int row = 0, numRows = map.squares.length; row < numRows; row++) {
+		for (int row = 0, numRows = map.squares.length; row < numRows; row++) {			
 			for (int col = 0, numCols = map.squares[0].length; col < numCols; col++) {
+				
 				// Check to see if there is an exception for this map square, if none then keep performing checks
 				if (!checkIfException(map, row, col, exceptions)) {
+					
 					// Perform checks to see if the map square is SOLID (order matters)
-					if (checkIfOnlyTransparentTexture(map, row, col) ||
+					if (checkIfOnlyTransparentTexture(map, row, col) ||							
 							checkSquareAgainstSolids(map, row, col, solids)) {
 						// Transparent-only square, unreachable
 						isSolid = true;
@@ -248,6 +337,7 @@ public class Map {
 				
 				// Set the map square type to SOLID or EMPTY (not solid)
 				map.squares[row][col].sqType = isSolid ? MapSquare.SquareType.SOLID : MapSquare.SquareType.EMPTY;
+				
 				// Reset to the default (not solid)
 				isSolid = false;
 			}
@@ -335,22 +425,47 @@ public class Map {
 		return false;		
 	}
 	
-		
-	// This can apply for both wood flooring or pavement or grass as supported by available textures
-	// Return a generated array? Or merge with a parameter-provided array?
-	// 4 1 5 5
-	// if randSeed == 0 			all normal
-	// if randSeed >= 1 && <= 10 	normal with unique
+	
+	/**
+	 * Generates "level" terrain like grass, wood flooring, pavement, etc.
+	 * in a rectangular area
+	 * 
+	 * Add's the generated textures to a map
+	 * 
+	 * @param map			The map to which the terrain is added
+	 * @param mapLayer		The layer of the map on which the terrain is drawn
+	 * @param startRow		The logical row where the terrain starts (top left)
+	 * @param startCol		The logical column where the terrain starts (top left)
+	 * @param endRow		The logical row where the terrain ends (bottom right)
+	 * @param endCol		The logical column where the terrain ends (bottom right)
+	 * @param terrainType	The "type" of terrain - which textures to use
+	 * @param terrainSeed	The Seed to allow for weighted randomness in terrain textures
+	 */
 	public void generateTerrain(Level map, MapLayer mapLayer, int startRow, int startCol, int endRow, int endCol, String terrainType, Seed terrainSeed) {
 		// Get the textures
 		TextureGroup tg = textures.get(terrainType);
+		
 		for (int row = startRow; row <= endRow; row++) {
 			for (int col = startCol; col <= endCol; col++) {
+				
+				// Set the map texture to be a terrain texture
 				map.textures[mapLayer.layer][row][col] = getTextureUsingSeed(terrainSeed, tg, "");
 			}
 		}
 	}
 	
+	/**
+	 * Not fully implemented
+	 * 
+	 * Creates a textured "path" between two or more points.
+	 *  
+	 * @param map					Reference to the map to which is being added a path
+	 * @param mapLayer				Which texture layer of the map to add the path
+	 * @param points				The points of the path
+	 * @param pathWidth				The logical width of the path
+	 * @param terrainGroup			The group of textures to use for the path
+	 * @param middleTerrainSeed		A Seed to allow for randomness in the middle (center) area of a path
+	 */
 	public void generatePathway(Level map, MapLayer mapLayer, Point[] points, int pathWidth, String terrainGroup, Seed middleTerrainSeed) {
 		// The idea here is that they can have for example, 3 points. one in the top right, one in the bottom right, and one in the bottom left
 		// this will then draw a pathway from point 1 to point 2, and point 2 will have a curved area as it transitions to the path to point 3		
