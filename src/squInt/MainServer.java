@@ -137,7 +137,8 @@ public class MainServer {
 		return "SI#" + DataPort.INIT_MSG + "#" + playerId 
 				+ "@" + players.get(playerId).avatarName 
 				+ "@" + players.get(playerId).x 
-				+ "@" + players.get(playerId).y;
+				+ "@" + players.get(playerId).y 
+				+ "@" + players.get(playerId).direction;
 	}
 	/**
 	 * generateMetaData - initialize server meta data

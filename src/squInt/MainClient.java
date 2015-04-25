@@ -139,14 +139,18 @@ public class MainClient {
 						String[] payload = splitMsg[2].split("@");
 
 						if(msgType == DataPort.INIT_MSG) {
+							// Gathering this data should ideally be bound or located near
+							// Wherever we set up the data to send on the server side so that
+							// we always get what we send
 							int playerId = Integer.parseInt(payload[0]);
 							String avatarName = payload[1];
 							int x = Integer.parseInt(payload[2]);
 							int y = Integer.parseInt(payload[3]);
+							int direction = Integer.parseInt(payload[4]);
 							// If we are receiving a spawn player message for a player we already
 							// know about, do not create it							
 							if (!gui.players.containsKey(playerId)) {
-								gui.createPlayer(playerId, avatarName, x, y);
+								gui.createPlayer(playerId, avatarName, x, y, direction);
 							}
 						}
 

@@ -141,11 +141,11 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param avatarName
 	 * @return
 	 */
-	public void createPlayer(int playerId, String avatarName, int x, int y) {
+	public void createPlayer(int playerId, String avatarName, int x, int y, int direction) {
 		if (playerId > num_players) {
 			num_players = playerId;
 		}
-		Player player = new Player(avatarName, Player.MoveDirection.DOWN, true, playerId, x, y);
+		Player player = new Player(avatarName, direction, true, playerId, x, y);
 		if (this.player == null) {
 			this.player = player;
 		}
