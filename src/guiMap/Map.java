@@ -487,6 +487,22 @@ public class Map {
 		
 	}
 	
+	/**
+	 * Creates a rectangular area of textures and creates an animator for them.
+	 * The animator is based on the number of textures in the texture group,
+	 * each texture representing a phase. They all transition at the same time.
+	 * The rectangular area spans from a top left to a bottom right corner.
+	 * 
+	 * @param map				The map to which the animated textures are added	
+	 * @param mapLayer			The layer of the map in which the animated textures are placed
+	 * @param startRow			The logical top left row location of the rectangle
+	 * @param startCol			The logical top left column location of the rectangle
+	 * @param endRow			The logical bottom right row location of the rectangle
+	 * @param endCol			The logical bottom right column location of the rectangle
+	 * @param terrainType		The texture group to use for the animation
+	 * @param animationDelay	The delay between each phase of the animation (in milliseconds)
+	 * @param callableAnimator	The animator
+	 */
 	public void generateAnimatedTerrain(Level map, MapLayer mapLayer, int startRow, int startCol, int endRow, int endCol, String terrainType, int animationDelay, Callable<?> callableAnimator) {
 		// Get the textures
 		TextureGroup tg = textures.get(terrainType);
@@ -501,15 +517,39 @@ public class Map {
 		scheduledExecutor.scheduleAtFixedRate(map.animator, 0, animationDelay, TimeUnit.MILLISECONDS);
 	}
 	
+	/**
+	 * Gets a random texture, out of a texture group, that has a similar name
+	 * to the one provided.
+	 * 
+	 * @param tg			The texture group to search for similar textures
+	 * @param genericName	The name substring of the texture
+	 * @return				A randomly selected texture of all similarly named textures
+	 */
 	private Texture getRandomNamedTexture(TextureGroup tg, String genericName) {
 		ArrayList<Texture> textures = tg.getTexturesLike(genericName);		
 		return (textures.get(new Random().nextInt(textures.size())));
 	}
 	
-	private Texture getRandomNamedTexture(ArrayList<Texture> textures, String genericName) {
+	/**
+	 * Gets a random texture, out of an arraylist of textures.
+	 * 
+	 * @param textures		The arraylist of textures to get a texture from
+	 * @return				A randomly selected texture from the list
+	 */
+	private Texture getRandomTexture(ArrayList<Texture> textures) {
 		return (textures.get(new Random().nextInt(textures.size())));
 	}
 	
+	/**
+	 * Gets a single texture out of a texture group using a seed to generate
+	 * a weighted random towards one subgroup of textures within the texture
+	 * group over the other subgroup.
+	 * 
+	 * @param seed		The seed to determine how to balance the two subgroups
+	 * @param textures	The texture group from which to get the texture
+	 * @param prefix	The texture name prefix
+	 * @return			A randomly selected texture with the provided prefix
+	 */
 	private Texture getTextureUsingSeed(Seed seed, TextureGroup textures, String prefix) {
 		if (seed == null) {
 			return getRandomNamedTexture(textures, ".png");
@@ -533,12 +573,21 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * Gets a single texture out of an arraylist of textures using a ratio
+	 * to generate a weighted random towards one portion of the textures
+	 * over another portion of the textures.
+	 * 
+	 * @param ratio		The ratio used to calculated a weighted random
+	 * @param textures	The arraylist of textures from which to get the texture
+	 * @return			The randomly selected texture
+	 */
 	private Texture getTextureUsingRatio(Ratio ratio, ArrayList<Texture> textures) {
 		if (textures == null || textures.size() == 0) {
 			return null;
 		}
 		if (ratio == null) {
-			return getRandomNamedTexture(textures, ".png");
+			return getRandomTexture(textures);
 		}
 		double random = Math.random();
 		Random r = new Random();
@@ -553,6 +602,13 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * Given a logical coordinate, returns the map square that corresponds
+	 * to that location.
+	 * 
+	 * @param p	The logical location of the square
+	 * @return	A reference to the map square at the logical location p
+	 */
 	public MapSquare getMapSquare(Point p) {
 		if (p.x < 0 || p.y < 0 || p.x >= mapCols || p.y >= mapRows) {
 			return null;
@@ -561,7 +617,16 @@ public class Map {
 	}
 	
 	/**
+	 * Generates a textured wall between two points
 	 * 
+	 * @param map		The map on which the wall should be drawn
+	 * @param mapLayer	The layer of the map in which the wall should be drawn
+	 * @param wallType	The type of wall, i.e. a top wall or bottom wall
+	 * @param wallGroup	The textures that should be used for the wall
+	 * @param wallRatio	A ratio used to pick random wall textures
+	 * @param row		The logical row where the wall starts being drawn
+	 * @param col		The logical column where the wall starts being drawn
+	 * @param end		The logical length of the wall
 	 */
 	public void generateWall(Level map, MapLayer mapLayer, Wall wallType, String wallGroup, Ratio wallRatio, int row, int col, int end) {
 		// Get the textures
@@ -583,6 +648,17 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * Generates a textured corner (for walls).
+	 * 
+	 * @param map			The map on which the corner should be drawn
+	 * @param mapLayer		The layer of the map in which the corner should be drawn
+	 * @param cornerType	The type of corner, i.e. bottom left or top right
+	 * @param cornerSize	Used to differentiated between different wall corner textures
+	 * @param cornerGroup	The textures that should be used for the corner
+	 * @param row			The logical row where the corner is drawn
+	 * @param col			The logical column where the corner is drawn
+	 */
 	public void generateCorner(Level map, MapLayer mapLayer, Corner cornerType, CornerSize cornerSize, String cornerGroup, int row, int col) {
 		// Get the textures
 		TextureGroup tg = textures.get(cornerGroup);
@@ -590,6 +666,14 @@ public class Map {
 		map.textures[mapLayer.layer][row][col] = getCornerTexture(tg, cornerType.corner, cornerSize.size);
 	}
 	
+	/**
+	 * A helper method to get a texture for a corner.
+	 * 
+	 * @param tg			The group of textures in which to find the corner
+	 * @param corner		The name of the corner texture
+	 * @param cornerType	The type of corner, i.e. top left or bottom right
+	 * @return				The corner texture
+	 */
 	private Texture getCornerTexture(TextureGroup tg, String corner, String cornerType) {
 		if (tg == null || corner == null || cornerType == null) {
 			return null;
@@ -597,6 +681,13 @@ public class Map {
 		return tg.getTextureExact("corner-" + corner + "-" + cornerType + ".png");
 	}
 	
+	/**
+	 * A helper method to get a texture for a corner shadow.
+	 * 
+	 * @param tg			The group of textures in which to find the corner shadow
+	 * @param cornerType	The type of corner shadow, i.e. top left or bottom right
+	 * @return				The corner shadow texture
+	 */
 	private Texture getCornerShadowTexture(TextureGroup tg, String cornerType) {
 		if (tg == null || cornerType == null) {
 			return null;
@@ -641,6 +732,17 @@ public class Map {
 //		ObjectTangle objTa = new ObjectTangle(components, mapSquareDim, row, col);
 	}
 	
+	/**
+	 * This method is used to generate the shadows for a wall
+	 * 
+	 * @param map				The map on which to draw the shadows
+	 * @param mapLayer			The layer in which to draw the shadows
+	 * @param wallShadowType	The type of shadow to use
+	 * @param shadowGroup		Where to get the shadow textures
+	 * @param row				The logical row to start drawing the shadows
+	 * @param col				The logical column to start drawing the shadows
+	 * @param end				The length of the line of shadows
+	 */
 	public void generateWallShading(Level map, MapLayer mapLayer, WallShadow wallShadowType, String shadowGroup, int row, int col, int end) {
 		// Get the textures
 		TextureGroup tg = textures.get(shadowGroup);
@@ -659,6 +761,16 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * This method is used to generate the shadows for a corner
+	 * 
+	 * @param map			The map on which to draw the shadows
+	 * @param mapLayer		The layer in which to draw the shadows
+	 * @param cornerType	The type of shadow to use
+	 * @param shadowGroup	Where to get the shadow textures
+	 * @param row			The logical row where the shadow is drawn
+	 * @param col			The logical column where the shadow is drawn
+	 */
 	public void generateCornerShading(Level map, MapLayer mapLayer, CornerShadow cornerType, String shadowGroup, int row, int col) {
 		// Get the textures
 		TextureGroup tg = textures.get(shadowGroup);
