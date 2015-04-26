@@ -106,7 +106,6 @@ public class MainServer {
 			} else if (newNumConnections < currentNumConnections) {
 				// A client has disconnected, figure out which one and generate a kill player message
 				// TODO
-				int test = 0;
 			}
 			
 			// Check to see if any messages have been received from clients
