@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import serverManagement.DataPort;
 import actions.PlayerAction;
 import actions.PlayerInit;
+import actions.PlayerUpdate;
 import actions.ServerMessage;
 
 /**
@@ -158,7 +159,14 @@ public class MainClient {
 					break;
 				case ServerMessage.ROOM_MSG:
 					break;
-				case ServerMessage.UPDATE_MSG:
+				case ServerMessage.UPDATE_MSG:	
+					// Tell the GUI to update a player
+					PlayerUpdate playerUpdate = PlayerUpdate.parseFromMsg(msg);
+
+					// If the GUI knows about this player, update it
+					if (gui.players.containsKey(playerUpdate.playerId)) {
+						gui.updatePlayer(playerUpdate.playerId, playerUpdate.x, playerUpdate.y, playerUpdate.direction);
+					}
 					break;
 				case ServerMessage.INVALID_MSG:
 					System.out.println("ERROR: Message was invalid.");

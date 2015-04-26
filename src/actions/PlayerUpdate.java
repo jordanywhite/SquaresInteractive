@@ -4,7 +4,8 @@ package actions;
 /**
  * PlayerUpdate
  * 
- * TODO - Not yet implemented
+ * NOT YET IMPLEMENTED
+ * 
  * This should be used by the server in intervals of say, 10 seconds.
  * The server will broadcast these updates for all players to make sure
  * that each client is synchronized with the server
@@ -13,10 +14,7 @@ package actions;
  * string (helper methods are here to encode/decode) and sent over the
  * network
  * 
- * @author Kai Jorgensen
- * @author Bryce Matsuda
  * @author Caleb Piekstra
- * @author Jordan White
  *
  */
 public class PlayerUpdate extends ServerMessage{

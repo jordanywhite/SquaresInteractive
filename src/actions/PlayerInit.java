@@ -1,6 +1,14 @@
 package actions;
 
-
+/**
+ * 
+ * PlayerInit
+ * 
+ * Used to instruct a client to create a player.
+ * 
+ * @author Caleb Piekstra 
+ *
+ */
 public class PlayerInit extends PlayerUpdate {
 	public String avatarName;
 
