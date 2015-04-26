@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JOptionPane;
+
 import serverManagement.DataPort;
 import actions.PlayerAction;
 import actions.PlayerInit;
@@ -24,8 +26,8 @@ public class MainClient {
 	/**
 	 * server IP we're connecting to
 	 */
-	private static final String ipAddr = "localhost";
-//		private static final String ipAddr = "10.12.18.80";
+	private String ipAddr = "localhost";
+//		private String ipAddr = "10.12.18.80";
 
 	/**
 	 * The front end GUI attached to this client
@@ -56,10 +58,96 @@ public class MainClient {
 		client.gui = new SquintGUI(client);
 		client.gui.initGUI(client.gui);
 		
+		// Prompt the user for the ip address of the server, "localhost" as default
+		// If the client has a hard-coded IPv4 then don't prompt for the address
+		if (client.ipAddr.equals("localhost")) {
+			client.askForIP(client);			
+		}
+		
+		// Wait for the client to connect to the server
 		client.waitForConnection(client);
 		// ok, connection is established. 
 
+		// Initialize the receiver so the client can get messages from the server
 		client.setUpReceiverThread(client);
+	}
+	
+	/**
+	 * Using input dialogs, ask the user for the IP address
+	 * of the server. 
+	 * 
+	 * If the IP is invalid or the user does not provide an IP,
+	 * the default "localhost" is used.
+	 * 
+	 * @param client
+	 */
+	private void askForIP(MainClient client) {
+		String s = (String)JOptionPane.showInputDialog(
+				client.gui,
+				"Enter the server's IP Address:\n"
+						+ "or \"localhost\" if the server is local",
+				"Server's IP Address",
+				JOptionPane.PLAIN_MESSAGE,
+				null,
+				null,
+				"localhost");
+
+		//If a string was returned, say so.
+		if ((s != null) && (s.length() > 0)) {
+			if (s.equals("localhost") || validIP(s)) {
+				JOptionPane.showMessageDialog(client.gui,
+						"Server IP: " + s,
+						"Server IP Addres",
+						JOptionPane.PLAIN_MESSAGE);
+				client.ipAddr = s;	
+			} else {
+				JOptionPane.showMessageDialog(client.gui,
+						"Invalid IP, using \"localhost\"",
+						"Invalid IP Address",
+						JOptionPane.WARNING_MESSAGE);
+				client.ipAddr = "localhost";
+			}
+			return;
+		}
+		// User did not input anything, set to default
+		JOptionPane.showMessageDialog(client.gui,
+				"No IP provided, using \"localhost\".");
+		client.ipAddr = "localhost";
+	}
+
+	/**
+	 * Checks if an IPv4 address is valid
+	 * 
+	 * @source http://stackoverflow.com/questions/4581877/validating-ipv4-string-in-java
+	 * 
+	 * @param ip	The IPv4 address
+	 * @return		Whether the ip was valid
+	 */
+	public static boolean validIP (String ip) {
+	    try {
+	        if (ip == null || ip.isEmpty()) {
+	            return false;
+	        }
+
+	        String[] parts = ip.split( "\\." );
+	        if ( parts.length != 4 ) {
+	            return false;
+	        }
+
+	        for ( String s : parts ) {
+	            int i = Integer.parseInt( s );
+	            if ( (i < 0) || (i > 255) ) {
+	                return false;
+	            }
+	        }
+	        if(ip.endsWith(".")) {
+	                return false;
+	        }
+
+	        return true;
+	    } catch (NumberFormatException nfe) {
+	        return false;
+	    }
 	}
 	
 	private void waitForConnection(MainClient client) {
