@@ -1,11 +1,10 @@
 package actions;
 
-import serverManagement.DataPort;
 
 /**
  * PlayerAction
  * 
- * pairs an action with a playerId. This will get converted into a
+ * pairs an action with a playerId. This gets converted into a
  * string (helper methods are here to encode/decode) and sent over the
  * network
  * 
@@ -15,8 +14,7 @@ import serverManagement.DataPort;
  * @author Jordan White
  *
  */
-public class PlayerAction {
-	public int playerId; 
+public class PlayerAction extends ServerMessage {
 	public Action action;
 	
 	/** 
@@ -38,7 +36,7 @@ public class PlayerAction {
 	 * @return message
 	 */
 	public static String generateActionMessage(int playerId, int actionInt) {
-		return "SI#" + DataPort.ACTION_MSG + "#" + playerId + "@" + actionInt;
+		return "SI#" + ServerMessage.ACTION_MSG + "#" + playerId + "@" + actionInt;
 	}
 	
 	/**
@@ -59,7 +57,7 @@ public class PlayerAction {
 			int msgType = Integer.parseInt(splitMsg[1]);
 			String[] payload = splitMsg[2].split("@");
 			
-			if(msgType == DataPort.ACTION_MSG) {
+			if(msgType == ServerMessage.ACTION_MSG) {
 				int playerId = Integer.parseInt(payload[0]);
 				Action action = getActionFromInt(Integer.parseInt(payload[1]));
 				
@@ -73,27 +71,6 @@ public class PlayerAction {
 		}
 		
 		return parsedPacket;
-	}
-
-	/**
-	 * Checks a string for valid message format.
-	 * @param msg
-	 * @return
-	 */
-	public static boolean isValidMessage(String msg) {
-		// message format: SI#[MessageType]#[payload...]
-		if(!msg.startsWith("SI#")) {
-			System.out.println("IGNORED: " + msg);
-			return false;
-		}
-
-		String[] splitMsg = msg.split("#");
-		if(splitMsg.length != 3) {
-			System.out.println("INVALID MSG FORMAT: " + msg);
-			return false;
-		}
-
-		return true;
 	}
 	
 	// getter methods //

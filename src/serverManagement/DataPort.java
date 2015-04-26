@@ -23,10 +23,6 @@ import java.util.concurrent.BlockingQueue;
  * @author Jordan White
  */
 public class DataPort implements Runnable {
-	// message types
-	public static final int INIT_MSG = 0;
-	public static final int ACTION_MSG = 1;
-	public static final int ROOM_MSG = 2;
 	
 	// Queue size
 	public static final int QUEUE_SIZE = 100;

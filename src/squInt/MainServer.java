@@ -16,11 +16,11 @@ import java.util.concurrent.TimeUnit;
 import player.Player;
 import resourceManagement.AvatarGroup;
 import resourceManagement.ResourceLoader;
-import serverManagement.DataPort;
 import serverManagement.ServerConnectionTable;
 import serverManagement.ServerQueuedMessage;
 import actions.Action;
 import actions.PlayerAction;
+import actions.PlayerInit;
 
 /**
  * The server that hosts the interactive room.
@@ -32,9 +32,9 @@ import actions.PlayerAction;
  */
 public class MainServer {
 
-	public static final int MAX_CLIENTS = 32;
-	public static final int SERVER_ID = 0;
-
+	public static final int MAX_CLIENTS = 32;	// Not yet implemented - currently no cap
+	public static final int SERVER_QUEUE_TIMEOUT = 100;	// In milliseconds - a timeout for getting received messages
+	
 	/*
 	 * The id to be assigned to the next client
 	 */
@@ -71,27 +71,51 @@ public class MainServer {
 		
 		// now have server just wait for inc messages and print them (until program is terminated)
 		while(true) {
-			if (mainServer.serverTable.getNumConnections() != currentNumConnections) {
+			
+			// Get the number of active connections
+			int newNumConnections = mainServer.serverTable.getNumConnections();
+			
+			// If there are more connections, process the new connections 
+			if (newNumConnections > currentNumConnections) {
+				
+				// Save the new current number of connections
 				currentNumConnections = mainServer.serverTable.getNumConnections();
+				
 				// A player is registered with the same ID as the connection
 				String playerInitMsg = mainServer.registerUser();
 				mainServer.initMsgs.add(playerInitMsg);
-				// Since the player / connection ID is stored in nextId which is incremented,
-				// the id for this connection is nextId - 1;
+				
+				// Broadcast the new player to all clients
 				mainServer.serverTable.sendToAll(playerInitMsg);
 				
-				// Every time somone connects, resend all player locations to all clients	
-				Iterator<Integer> it = mainServer.players.keySet().iterator();
-				while (it.hasNext()) {
-					mainServer.serverTable.sendToAll(mainServer.generatePlayerInitMessage(it.next()));
+				// Every time a new client connects, tell all clients to generate all players		
+				// It is up to the clients to ignore players they already know about
+				// Create an iterator to go through all of the connected players
+				Iterator<Player> playerIterator = mainServer.players.values().iterator();				
+				while (playerIterator.hasNext()) {
+					
+					// Get the player using the iterator
+					Player player = playerIterator.next();
+					
+					// Generate a new init message for the player
+					String initMsg = PlayerInit.generateInitMessage(player.id, player.avatarName, player.x, player.y, player.direction);
+					
+					// Broadcast the init message
+					mainServer.serverTable.sendToAll(initMsg);
 				}
+			} else if (newNumConnections < currentNumConnections) {
+				// A client has disconnected, figure out which one and generate a kill player message
+				// TODO
 			}
 			
+			// Check to see if any messages have been received from clients
 			if(mainServer.serverQueue.peek() != null) {
-				// ServerQueuedMessage object just contains the source DataPort and the received String
-				ServerQueuedMessage sqm = null;
-				try {
-					sqm = mainServer.serverQueue.poll(100, TimeUnit.MILLISECONDS);
+				try {					
+					// ServerQueuedMessage object just contains the source DataPort and the received String
+					ServerQueuedMessage sqm = null;
+					
+					// Grab the data
+					sqm = mainServer.serverQueue.poll(SERVER_QUEUE_TIMEOUT, TimeUnit.MILLISECONDS);
 					System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
 					
 					if (mainServer.requestAction(PlayerAction.parseFromMsg(sqm.message))) {
@@ -125,21 +149,7 @@ public class MainServer {
 		
 		// server is now ready and listening for connections!!!
 	}
-	
 
-	/**
-	 *  creates a server message that broadcasts a new user connection
-	 *  
-	 * @param playerId the connecting player
-	 * @return the new server message
-	 */
-	public String generatePlayerInitMessage(int playerId) {				
-		return "SI#" + DataPort.INIT_MSG + "#" + playerId 
-				+ "@" + players.get(playerId).avatarName 
-				+ "@" + players.get(playerId).x 
-				+ "@" + players.get(playerId).y 
-				+ "@" + players.get(playerId).direction;
-	}
 	/**
 	 * generateMetaData - initialize server meta data
 	 */
@@ -184,11 +194,7 @@ public class MainServer {
 		addUser(newPlayer);
 		changeMapOccupation(newPlayer.x, newPlayer.y, newPlayer.id, true);
 				
-		return generatePlayerInitMessage(newPlayer.id);
-	}
-	
-	public String clientAddUser(int playerId) {
-		return generatePlayerInitMessage(playerId);
+		return PlayerInit.generateInitMessage(newPlayer.id, newPlayer.avatarName, newPlayer.x, newPlayer.y, newPlayer.direction);
 	}
 	
 	/**

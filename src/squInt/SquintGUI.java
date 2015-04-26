@@ -69,20 +69,23 @@ public class SquintGUI extends JPanel implements KeyListener {
 	public static final int MAP_LAYERS = 4;	// The number of texture layers in the map
 	public static final int MAP_LEVEL = 0;	// Currently unimplemented
 
+	// The delay between each phase of the animation with animated terrain
 	public static final int TERRAIN_ANIMATION_DELAY = 200;	
+
+	// the number of pixels per grid square
+	public static final int MAP_DIM = 40;	
 
 	// The player attached to the client/GUI
 	public Player player;
-	// The number of clients connected to the host
-	public int num_players = 0;		
+
+	// The "players connected to the server" (not really)
+	public HashMap<Integer, Player> players = null;
+	
+	// Texture Groups for the avatars
+	AvatarGroup avatars = null;
+	
 	// Used to keep track of keys that have not been released
 	public List<Integer> heldKeys = new ArrayList<Integer>();	
-
-	// the number of pixels per grid square
-	public static final int MAP_DIM = 40;				
-
-	// The "background" image for the level - used so we only redraw moving parts
-	private BufferedImage roomBackgroundImage = null;
 
 	// The entire level
 	Map level = null;
@@ -93,12 +96,9 @@ public class SquintGUI extends JPanel implements KeyListener {
 
 	// Resource loader
 	private ResourceLoader resLoad = null;
-
-	// Texture Groups for the avatars
-	AvatarGroup avatars = null;
-
-	// The "players connected to the server" (not really)
-	public HashMap<Integer, Player> players = null;
+	
+	// The "background" image for the level - used so we only redraw moving parts
+	private BufferedImage roomBackgroundImage = null;
 
 	// The client attached to this GUI
 	MainClient mainClient;
@@ -108,18 +108,22 @@ public class SquintGUI extends JPanel implements KeyListener {
 	{				
 		// Create a resource loader so we can get textures
 		resLoad = new ResourceLoader();		
+		
 		// Create the level's map editor
-		MapEditor me = new MapEditor(resLoad, MAP_LEVEL, CANVAS_WIDTH, CANVAS_HEIGHT, MAP_LAYERS, MAP_DIM);
+		MapEditor me = new MapEditor(resLoad, MAP_LEVEL, CANVAS_WIDTH, CANVAS_HEIGHT, MAP_LAYERS, MAP_DIM);		
 		// Edit the level using the map editor
-		editLevel(me);
+		editLevel(me);		
 		// Save the level's map editor as a map
 		level = (Map)me;
+		
 		// Allow for easy access to the map squares
-		mapSquares = level.map.squares;
+		mapSquares = level.map.squares;		
 		// Allow for easy access to the map's animated squares
 		animatedSquares = level.map.animatedSquares;
+		
 		// Create a static background image for the level
 		roomBackgroundImage = makeImage(level.map.textures, level.map.coords);
+		
 		// Create an avatar group for the players
 		avatars = new AvatarGroup(resLoad, "re");
 
@@ -142,19 +146,47 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @return
 	 */
 	public void createPlayer(int playerId, String avatarName, int x, int y, int direction) {
-		if (playerId > num_players) {
-			num_players = playerId;
-		}
+		
+		// Create the player
 		Player player = new Player(avatarName, direction, true, playerId, x, y);
+		
+		// If we do not have a player, make this one ours! - TODO
+		// This is a bad idea, we need to check if the playerId matches our
+		// MainClient's connections's unique ID so we don't steal a player 
+		// meant for a different client
 		if (this.player == null) {
 			this.player = player;
 		}
-		//		// Add the player to the list of players
+		
+		// Add the player to the list of players
 		players.put(player.id, player);	
+		
 		// Update the map to indicate the player "spawning"
 		changeMapOccupation(player.x, player.y, player.id, true);
-		// Return a reference to the player if needed
-		//		return player;
+	}
+	
+	/**
+	 * This will be called when an UPDATE_MSG is received from the server telling
+	 * us to update our knowledge of the player to match what the server knows
+	 * 
+	 * @param playerId	The ID of the player
+	 * @param x			The player's logical column location
+	 * @param y			The player's logical row location
+	 * @param direction	The direction that the player is facing
+	 */
+	public void updatePlayer(int playerId, int x, int y, int direction) {
+		
+		// Make sure this client has knowledge of the player
+		if (players.containsKey(playerId)) {
+			
+			// Get the player
+			Player player = players.get(playerId);
+			
+			// Update the player's status
+			player.x = x;
+			player.y = y;
+			player.direction = direction;
+		}
 	}
 
 	/**

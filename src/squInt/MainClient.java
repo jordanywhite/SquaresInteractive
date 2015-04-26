@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import serverManagement.DataPort;
 import actions.PlayerAction;
+import actions.PlayerInit;
+import actions.ServerMessage;
 
 /**
  * The main back-end client
@@ -126,45 +128,35 @@ public class MainClient {
 					// not really closing the connection, but kill the receiver
 					return;
 				}
-				System.out.println("SUCCESS: Data received! Data: " + msg);
-
-				String[] splitMsg = msg.split("#");
-				int msgType = Integer.parseInt(splitMsg[1]);
-
-				// If we have an INIT_MSG, create a player
-				// Let's pretend we get data from the host and it is an INIT_MSG
-				if (msgType == DataPort.INIT_MSG) {
-					// TODO: Make a separate class for parsing the data
-					try {
-						String[] payload = splitMsg[2].split("@");
-
-						if(msgType == DataPort.INIT_MSG) {
-							// Gathering this data should ideally be bound or located near
-							// Wherever we set up the data to send on the server side so that
-							// we always get what we send
-							int playerId = Integer.parseInt(payload[0]);
-							String avatarName = payload[1];
-							int x = Integer.parseInt(payload[2]);
-							int y = Integer.parseInt(payload[3]);
-							int direction = Integer.parseInt(payload[4]);
-							// If we are receiving a spawn player message for a player we already
-							// know about, do not create it							
-							if (!gui.players.containsKey(playerId)) {
-								gui.createPlayer(playerId, avatarName, x, y, direction);
-							}
-						}
-
-					} catch (NumberFormatException e) {
-						System.out.println("ERROR PARSING MESSAGE: " + msg);
+				System.out.println("Message received: " + msg);
+				
+				// Get the type of the message
+				int msgType = ServerMessage.getMessageType(msg);
+				
+				// Figure out what to do based on the type of message
+				switch (msgType) {
+				case ServerMessage.ACTION_MSG:
+					// Tell the GUI to move the player
+					PlayerAction playerAction = PlayerAction.parseFromMsg(msg);
+					if (playerAction != null) {
+						gui.movePlayer(PlayerAction.getActionNum(playerAction.action), 
+								playerAction.playerId);
 					}
-				}
-
-				// If we have an ACTION_MSG, update map so that the specified player 
-				// is at the specified location
-				PlayerAction playerAction = PlayerAction.parseFromMsg(msg);
-				if (playerAction != null) {
-					gui.movePlayer(PlayerAction.getActionNum(playerAction.action), 
-							playerAction.playerId);
+					break;
+				case ServerMessage.INIT_MSG:	
+					PlayerInit playerInit = PlayerInit.parseFromMsg(msg);
+					if (!gui.players.containsKey(playerInit.playerId)) {
+						gui.createPlayer(playerInit.playerId, playerInit.avatarName, playerInit.x, playerInit.y, playerInit.direction);
+					}
+					break;
+				case ServerMessage.ROOM_MSG:
+					break;
+				case ServerMessage.UPDATE_MSG:
+					break;
+				case ServerMessage.INVALID_MSG:
+					System.out.println("ERROR: Message was invalid.");
+					break;
+				default: break;
 				}
 			}
 		}		
