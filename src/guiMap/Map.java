@@ -438,12 +438,12 @@ public class Map {
 	 * @param startCol		The logical column where the terrain starts (top left)
 	 * @param endRow		The logical row where the terrain ends (bottom right)
 	 * @param endCol		The logical column where the terrain ends (bottom right)
-	 * @param terrainType	The "type" of terrain - which textures to use
+	 * @param terrainGroup	The "type" of terrain - which textures to use
 	 * @param terrainSeed	The Seed to allow for weighted randomness in terrain textures
 	 */
-	public void generateTerrain(Level map, MapLayer mapLayer, int startRow, int startCol, int endRow, int endCol, String terrainType, Seed terrainSeed) {
+	public void generateTerrain(Level map, MapLayer mapLayer, int startRow, int startCol, int endRow, int endCol, String terrainGroup, Seed terrainSeed) {
 		// Get the textures
-		TextureGroup tg = textures.get(terrainType);
+		TextureGroup tg = textures.get(terrainGroup);
 		
 		for (int row = startRow; row <= endRow; row++) {
 			for (int col = startCol; col <= endCol; col++) {
@@ -499,13 +499,13 @@ public class Map {
 	 * @param startCol			The logical top left column location of the rectangle
 	 * @param endRow			The logical bottom right row location of the rectangle
 	 * @param endCol			The logical bottom right column location of the rectangle
-	 * @param terrainType		The texture group to use for the animation
+	 * @param terrainGroup		The texture group to use for the animation
 	 * @param animationDelay	The delay between each phase of the animation (in milliseconds)
 	 * @param callableAnimator	The animator
 	 */
-	public void generateAnimatedTerrain(Level map, MapLayer mapLayer, int startRow, int startCol, int endRow, int endCol, String terrainType, int animationDelay, Callable<?> callableAnimator) {
+	public void generateAnimatedTerrain(Level map, MapLayer mapLayer, int startRow, int startCol, int endRow, int endCol, String terrainGroup, int animationDelay, Callable<?> callableAnimator) {
 		// Get the textures
-		TextureGroup tg = textures.get(terrainType);
+		TextureGroup tg = textures.get(terrainGroup);
 		for (int row = startRow; row <= endRow; row++) {
 			for (int col = startCol; col <= endCol; col++) {
 				map.textures[mapLayer.layer][row][col] = GlobalHelper.textureGroupToArrayList(tg).get(0);
