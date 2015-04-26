@@ -2,13 +2,24 @@ package imageProcessing;
 import java.awt.Dimension;
 
 /**
+ * ImageEditor
  * 
+ * A collection of methods that can be used to edit an image.
  * 
  * @author Caleb Piekstra
  *
  */
-
 public class ImageEditor {
+	
+	/**
+	 * Given the actual size of an image and the desired size of an image, scale
+	 * the image to match the desired size.
+	 * 
+	 * @param imgSize	The actual size of the image
+	 * @param boundary	The desired size of the image
+	 * @param scaleUp	Whether the image should be scaled up or down to the desired size
+	 * @return			The new, sacled dimension of the image
+	 */
 	public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary, boolean scaleUp) {
 
 	    int original_width = imgSize.width;

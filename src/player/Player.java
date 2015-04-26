@@ -1,7 +1,4 @@
 package player;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import resourceManagement.ResourceLoader;
 
 /**
@@ -36,7 +33,6 @@ public class Player {
 	public int direction;				// direction the player want to move
 	public boolean allowedToMove;		// is player allowed to move?
 	public int animatePhase;			// which animation phase player is in
-	private Timer moveTimer = null;		// delay timer
 	public int id;						// player id
 	public int speed;					// player movement speed
 	public boolean inAnimationPhase;	// is player being animated?
@@ -70,18 +66,5 @@ public class Player {
 		this.y = y;
 		// Set the avatar last, if we couldn't create a player then it will have a null avatar
 		this.avatarName = avatarName;
-	}
-	
-	public void startMoveTimer() {		
-		allowedToMove = false;
-		moveTimer = new Timer();
-		moveTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				allowedToMove = true;
-				moveTimer.cancel();
-			}		
-		}, MOVE_DELAY);
-	}
-	
+	}	
 }
