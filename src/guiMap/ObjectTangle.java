@@ -1,6 +1,5 @@
 package guiMap;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -10,6 +9,14 @@ import resourceManagement.Texture;
 
 /**
  * IN PROGRESS
+ * 
+ * NOT YET IMPLEMENTED
+ * 
+ * STOP READING
+ * 
+ * SERIOUSLY
+ * 
+ * THE AUTHOR DOESN'T EVEN UNDERSTAND IT
  * 
  * @author Caleb Piekstra
  *

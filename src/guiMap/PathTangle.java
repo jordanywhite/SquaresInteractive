@@ -7,20 +7,38 @@ import java.util.ArrayList;
  * 	Needs to support diagonal paths
  * 	Needs to support a sequence of points (curves)
  * 
+ * This class is used to determine the logical locations of
+ * a path's textures. It is given a list of points along the path
+ * such as the starting point, and a corner in the path, and the
+ * end of the path.
+ * 
+ * 	For example, the following path would have 3 points:
+ * 	 (start)
+ * 		|
+ * 		|____ (end)
+ *  (corner) 
+ *  
+ *  
  * @author Caleb Piekstra
  *
  */
-
 public class PathTangle {
 	
+	// The direction of a segment of the path
 	private static enum Direction { LEFT, RIGHT, DOWN, UP };
 	
 	// Holds the each square in the path
 	private ArrayList<PathSquare> pathSquares = null;
 	
+	// Each logical texture square of the path
 	public final class PathSquare {
+		
+		// The name or substring of the name of the texture		
 		public final String name;
+		
+		// The logical location of the square		
 		public final Point coord;
+		
 		public PathSquare (String name, Point location) {
 			this.name = name;
 			coord = location;
@@ -28,12 +46,13 @@ public class PathTangle {
 	}	
 	
 	/**
-	 * There must be at least 2 points and width must be odd
+	 * There must be at least 2 points in the path
 	 * Note that the width is the size of the center of the pathway, 
 	 * excluding the borders. So, a width of 1 would actually be 3 wide 
+	 * after the outer borders are added
 	 * 
-	 * @param points
-	 * @param width
+	 * @param points	The points along the path (see PathTangle description)
+	 * @param width		The logical width of the center of the path
 	 */
 	public PathTangle(Point[] points, int width) {
 		if (points.length >= 2) {
@@ -41,21 +60,40 @@ public class PathTangle {
 			pathSquares = new ArrayList<PathSquare>();
 			
 			for (int pIdx = 0, numPoints = points.length - 1; pIdx < numPoints; pIdx++) {
+				// Look at two points along the path at a time
 				Point p1 = points[pIdx];
 				Point p2 = points[pIdx+1];
+				
 				// Determine the direction to get to p2 from p1
-				Direction direction = determineDirection(p1, p2);				
+				Direction direction = determineDirection(p1, p2);
+				
 				// Set the side walls, corners, and middle section
 				createPath(direction, width, p1, p2);
+				
 				// Handle specific direction cases
 			}
 		}
 	}
 	
+	/**
+	 * Used to get the squares that make up the path
+	 * 
+	 * @return	Every square in the path
+	 */
 	public ArrayList<PathSquare> getSquares() {
 		return new ArrayList<PathSquare>(pathSquares);
 	}
 	
+	/**
+	 * Given a direction, width, and two points (start and end)
+	 * generate the path squares for the entire path
+	 * 
+	 * 
+	 * @param d		The direction of the path (between two points)
+	 * @param width	The width of the center of the path
+	 * @param p1	The logical starting point of the path
+	 * @param p2	The logical ending point of the path
+	 */
 	private void createPath(Direction d, int width, Point p1, Point p2) {
 		// Determine how far away from the center the corners are
 		int sideOneOffset = 0;	// Top or Left depending on path direction
