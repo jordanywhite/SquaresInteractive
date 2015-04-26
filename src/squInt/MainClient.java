@@ -7,8 +7,9 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
 
 import serverManagement.DataPort;
-import actions.PlayerAction;
+import actions.Action;
 import actions.PlayerInit;
+import actions.PlayerMove;
 import actions.PlayerUpdate;
 import actions.ServerMessage;
 
@@ -25,8 +26,14 @@ public class MainClient {
 
 	/**
 	 * server IP we're connecting to
+	 * 
+	 * If the server IP is set to "localhost" the client will prompt
+	 * 	the user for the server's IP address
+	 * If the server IP is set to anything other than "localhost"
+	 * 	it will simply use the hard-coded IP address
+	 * 
 	 */
-	private String ipAddr = "localhost";
+	private String ipAddr = "localhost";	
 //		private String ipAddr = "10.12.18.80";
 
 	/**
@@ -97,12 +104,12 @@ public class MainClient {
 			if (s.equals("localhost") || validIP(s)) {
 				JOptionPane.showMessageDialog(client.gui,
 						"Server IP: " + s,
-						"Server IP Addres",
+						"Server IP Address",
 						JOptionPane.PLAIN_MESSAGE);
 				client.ipAddr = s;	
 			} else {
 				JOptionPane.showMessageDialog(client.gui,
-						"Invalid IP, using \"localhost\"",
+						"Invalid IP\n" + "using \"localhost\"",
 						"Invalid IP Address",
 						JOptionPane.WARNING_MESSAGE);
 				client.ipAddr = "localhost";
@@ -224,12 +231,12 @@ public class MainClient {
 				
 				// Figure out what to do based on the type of message
 				switch (msgType) {
-				case ServerMessage.ACTION_MSG:
+				case ServerMessage.MOVE_MSG:
 					// Tell the GUI to move the player
-					PlayerAction playerAction = PlayerAction.parseFromMsg(msg);
-					if (playerAction != null) {
-						gui.movePlayer(PlayerAction.getActionNum(playerAction.action), 
-								playerAction.playerId);
+					PlayerMove playerMove = PlayerMove.parseFromMsg(msg);
+					if (playerMove != null) {
+						gui.movePlayer(Action.getActionNum(playerMove.action), 
+								playerMove.playerId);
 					}
 					break;
 				case ServerMessage.INIT_MSG:	

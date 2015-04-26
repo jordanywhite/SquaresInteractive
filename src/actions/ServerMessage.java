@@ -13,7 +13,7 @@ public class ServerMessage {
 	
 	// message types
 	public static final int INIT_MSG = 0;
-	public static final int ACTION_MSG = 1;
+	public static final int MOVE_MSG = 1;
 	public static final int ROOM_MSG = 2;
 	public static final int UPDATE_MSG = 3;
 	public static final int INVALID_MSG = 999;

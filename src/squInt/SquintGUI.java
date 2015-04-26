@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -38,15 +37,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import actions.Action;
-import actions.PlayerAction;
 import player.Player;
-import playerMovement.Animators;
 import playerMovement.MovePlayer;
 import resourceManagement.Avatar;
 import resourceManagement.AvatarGroup;
 import resourceManagement.ResourceLoader;
 import resourceManagement.Texture;
+import actions.Action;
+import actions.Action.PlayerAction;
+import actions.PlayerMove;
 
 /**
  * This code is the GUI portion of a larger project being built for a networking class
@@ -252,23 +251,32 @@ public class SquintGUI extends JPanel implements KeyListener {
 	\**                                                                                           **/	
 
 	/**
-	 * Handles player movement upon keyboard input
-	 * 
-	 * @param direction
-	 * @param player
+	 * Handles player movement upon receiving a move message from the server
+	 * @param action	The player (movement) action
+	 * @param playerId	The id of the player to move
 	 */
-	public void movePlayer(int direction, int playerId) {
+	public void movePlayer(PlayerAction action, int playerId) {
+		movePlayer(Action.getActionNum(action), playerId);
+	}
+	
+	/**
+	 * Handles player movement upon receiving a move message from the server
+	 * 
+	 * @param moveDirection	The direction the player is moving
+	 * @param player		The id of the player being moved
+	 */
+	public void movePlayer(int moveDirection, int playerId) {
 		// The player in our GUI that needs to move
 		Player player = players.get(playerId);
 		// A callable method so we can repaint during animation
 		PlayerAnimator aniUp = null;
 
 		// Check if we are simply changing direction or animating
-		if (player.direction == direction) {
+		if (player.direction == moveDirection) {
 			// See if we are moving instead of jumping
 			if (!player.isJumping) {
 				// Holds the destination location of the player
-				Point newSquareLoc = getNewPlayerPosition(player, direction);		
+				Point newSquareLoc = Player.getNewPlayerPosition(player, moveDirection);		
 				// Holds the map square at the destination point
 				MapSquare destinationSquare = level.getMapSquare(newSquareLoc);
 				// Make sure there is a square at the destination
@@ -285,7 +293,7 @@ public class SquintGUI extends JPanel implements KeyListener {
 			aniUp = new PlayerAnimator();
 			aniUp.setPlayer(player);
 		}
-		MovePlayer.movePlayer(direction, player, aniUp);
+		MovePlayer.movePlayer(moveDirection, player, aniUp);
 		repaint();
 	}
 
@@ -319,30 +327,9 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Update the map to indicate that the player is no longer at it's old location
 		changeMapOccupation(player.x, player.y, player.id, false);
 		// Animation has been completed at this point, update the player's location
-		Point newLocation = getNewPlayerPosition(player, player.direction);
+		Point newLocation = Player.getNewPlayerPosition(player, player.direction);
 		player.x = newLocation.x;
 		player.y = newLocation.y;
-	}
-
-	/**
-	 * Figure out where the player would end up if they moved in
-	 * a direction
-	 * 
-	 * @param player
-	 * @param direction
-	 * @return
-	 */
-	private Point getNewPlayerPosition(Player player, int direction){
-		Point newPoint = new Point(player.x, player.y);
-		Action action = PlayerAction.getActionFromInt(direction);
-		switch(action) {
-		case MOVE_RIGHT: newPoint.x++;	break;
-		case MOVE_UP:	newPoint.y--;	break;
-		case MOVE_LEFT:	newPoint.x--;	break;
-		case MOVE_DOWN:	newPoint.y++;	break;
-		case INTERACT:	break;
-		}
-		return newPoint;
 	}
 
 	/**___________________________________________________________________________________________**\
@@ -677,44 +664,48 @@ public class SquintGUI extends JPanel implements KeyListener {
 		}
 		// Change the player's speed to RUNNING if SHIFT is held
 		if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-			player.speed = Player.RUNNING;	
+			// TODO - running causes server - client desynchronization
+			// and is thus currently disabled
+			//player.speed = Player.RUNNING;	
 		}
 		// Do not process player movements unless the player is allowed to move
 		if (player.allowedToMove) {
-			int moveDirection = -1;
+			PlayerAction moveAction = PlayerAction.INVALID;
 			if(heldKeys.contains(KeyEvent.VK_D) || heldKeys.contains(KeyEvent.VK_RIGHT)) {
 				// The 'D' key corresponds to RIGHT
-				moveDirection = Player.MoveDirection.RIGHT;
+				moveAction = PlayerAction.MOVE_RIGHT;
 			} else if(heldKeys.contains(KeyEvent.VK_W) || heldKeys.contains(KeyEvent.VK_UP)) {
 				// The 'W' key corresponds to UP
-				moveDirection = Player.MoveDirection.UP;
+				moveAction = PlayerAction.MOVE_UP;
 			} else if(heldKeys.contains(KeyEvent.VK_A) || heldKeys.contains(KeyEvent.VK_LEFT)) {
 				// The 'A' key corresonds to LEFT
-				moveDirection = Player.MoveDirection.LEFT;
+				moveAction = PlayerAction.MOVE_LEFT;
 			} else if(heldKeys.contains(KeyEvent.VK_S) || heldKeys.contains(KeyEvent.VK_DOWN)) {
 				// The 'S' key corresponds to DOWN
-				moveDirection = Player.MoveDirection.DOWN;
+				moveAction = PlayerAction.MOVE_DOWN;
 			} else if(heldKeys.contains(KeyEvent.VK_SPACE)) {
 				// The 'SPACE' key makes the player jump
 				player.isJumping = true;
-				moveDirection = player.direction;
+				moveAction = Action.getActionFromInt(player.direction);
 			} else if(heldKeys.contains(KeyEvent.VK_Q)) {
 				// The 'Q' key makes the player spin counter-clockwise
 				int modVal = Player.MoveDirection.RIGHT + 1;
-				moveDirection = ((((player.direction-1) % modVal) + modVal) % modVal);
+				int rotatedDirection = ((((player.direction-1) % modVal) + modVal) % modVal);
+				moveAction = Action.getActionFromInt(rotatedDirection);
 			} else if(heldKeys.contains(KeyEvent.VK_E)) {
 				// The 'E' key makes the player spin clockwise
-				moveDirection = (player.direction + 1) % (Player.MoveDirection.RIGHT + 1);
+				int rotatedDirection = (player.direction + 1) % (Player.MoveDirection.RIGHT + 1);
+				moveAction = Action.getActionFromInt(rotatedDirection);
 			}
 
 			// Check to see if a "movement key" was pressed
-			if (moveDirection != -1) { 
+			if (moveAction != PlayerAction.INVALID) { 
 				// If the player is jumping, handle the movement locally
 				if (player.isJumping) {
-					movePlayer(moveDirection, player.id);
+					movePlayer(Action.getActionNum(moveAction), player.id);
 				} else {
 					// If the player is not jumping then send a move request to the server
-					String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
+					String sendMe = PlayerMove.generateMoveMessage(player.id, moveAction);
 					mainClient.connection.send(sendMe);	
 					
 					// As soon as a move request is sent to the server block the user from 

@@ -19,8 +19,8 @@ import resourceManagement.ResourceLoader;
 import serverManagement.ServerConnectionTable;
 import serverManagement.ServerQueuedMessage;
 import actions.Action;
-import actions.PlayerAction;
 import actions.PlayerInit;
+import actions.PlayerMove;
 
 /**
  * The server that hosts the interactive room.
@@ -32,8 +32,11 @@ import actions.PlayerInit;
  */
 public class MainServer {
 
-	public static final int MAX_CLIENTS = 32;	// Not yet implemented - currently no cap
-	public static final int SERVER_QUEUE_TIMEOUT = 100;	// In milliseconds - a timeout for getting received messages
+	// Not yet implemented - currently no cap
+	public static final int MAX_CLIENTS = 32;	
+	
+	// In milliseconds - a timeout for waiting for received messages
+	public static final int SERVER_QUEUE_TIMEOUT = 100;	
 	
 	/*
 	 * The id to be assigned to the next client
@@ -118,7 +121,7 @@ public class MainServer {
 					sqm = mainServer.serverQueue.poll(SERVER_QUEUE_TIMEOUT, TimeUnit.MILLISECONDS);
 					System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
 					
-					if (mainServer.requestAction(PlayerAction.parseFromMsg(sqm.message))) {
+					if (mainServer.requestAction(PlayerMove.parseFromMsg(sqm.message))) {
 						// send diff
 						mainServer.serverTable.sendToAll(sqm.message);
 					}
@@ -294,23 +297,23 @@ public class MainServer {
 	 * 
 	 * THE CALLER MUST BROADCAST A VALID MOVE TO CLIENTS TODO
 	 *
-	 * @param playerAction
+	 * @param playerMove
 	 *            on which we shall act on
 	 * @return true if the action is worthy, false if the action is found
 	 *         wanting
 	 */
-	public boolean requestAction(PlayerAction playerAction) {
+	public boolean requestAction(PlayerMove playerMove) {
 
-		if (playerAction == null) {
+		if (playerMove == null) {
 			return false;
 		}
 
-		int playerId = playerAction.playerId;
+		int playerId = playerMove.playerId;
 		if (!players.containsKey(playerId)) {
 			return false;
 		}
 		
-		int moveDirection = PlayerAction.getActionNum(playerAction.action);		
+		int moveDirection = Action.getActionNum(playerMove.action);		
 
 		// TODO BROADCAST THE MOVE (DIFF) TO ALL CONNECTED CLIENTS
 		return isValidMove(moveDirection, playerId);
@@ -334,7 +337,7 @@ public class MainServer {
 			return true;
 		}
 		// Get the coordinates of the destination square based on the move direction
-		Point destSquarePoint = getNewPlayerPosition(players.get(playerId), moveDirection);
+		Point destSquarePoint = Player.getNewPlayerPosition(players.get(playerId), moveDirection);
 		// Get the destination square based on the move direction
 		MapSquare destSquare = mapSquares[destSquarePoint.y][destSquarePoint.x];
 		// Check if the destination square is occupied or SOLID
@@ -379,26 +382,5 @@ public class MainServer {
 		// Set the new square
 		destSquare.playerId = playerId;
 		destSquare.isOccupied = true;		
-	}
-	
-	/**
-	 * Figure out where the player would end up if they moved in
-	 * a direction
-	 * 
-	 * @param player
-	 * @param direction
-	 * @return
-	 */
-	private Point getNewPlayerPosition(Player player, int direction){
-		Point newPoint = new Point(player.x, player.y);
-		Action action = PlayerAction.getActionFromInt(direction);
-		switch(action) {
-			case MOVE_RIGHT: newPoint.x++;	break;
-			case MOVE_UP:	newPoint.y--;	break;
-			case MOVE_LEFT:	newPoint.x--;	break;
-			case MOVE_DOWN:	newPoint.y++;	break;
-			case INTERACT:	break;
-		}
-		return newPoint;
 	}
 }

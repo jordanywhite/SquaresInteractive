@@ -1,4 +1,8 @@
 package player;
+import java.awt.Point;
+
+import actions.Action;
+import actions.Action.PlayerAction;
 import resourceManagement.ResourceLoader;
 
 /**
@@ -12,10 +16,10 @@ import resourceManagement.ResourceLoader;
 public class Player {
 	
 	public static class MoveDirection { 
-		public static final int DOWN = 0;
-		public static final int LEFT = 1;
-		public static final int UP = 2;
-		public static final int RIGHT = 3;
+		public static final int DOWN = Action.getActionNum(PlayerAction.MOVE_DOWN);
+		public static final int LEFT = Action.getActionNum(PlayerAction.MOVE_LEFT);
+		public static final int UP = Action.getActionNum(PlayerAction.MOVE_UP);
+		public static final int RIGHT = Action.getActionNum(PlayerAction.MOVE_RIGHT);
 	}	
 	
 	public static final int MOVE_DELAY = 250; // in milliseconds
@@ -67,4 +71,26 @@ public class Player {
 		// Set the avatar last, if we couldn't create a player then it will have a null avatar
 		this.avatarName = avatarName;
 	}	
+	
+	/**
+	 * Figure out where the player would end up if they moved in
+	 * a direction
+	 * 
+	 * @param player
+	 * @param direction
+	 * @return
+	 */
+	public static Point getNewPlayerPosition(Player player, int direction){
+		Point newPoint = new Point(player.x, player.y);
+		PlayerAction action = Action.getActionFromInt(direction);
+		switch(action) {
+			case MOVE_RIGHT: newPoint.x++;	break;
+			case MOVE_UP:	newPoint.y--;	break;
+			case MOVE_LEFT:	newPoint.x--;	break;
+			case MOVE_DOWN:	newPoint.y++;	break;
+			case INTERACT:	break;
+			case INVALID:	break;
+		}
+		return newPoint;
+	}
 }
