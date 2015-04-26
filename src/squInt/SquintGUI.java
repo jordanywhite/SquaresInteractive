@@ -27,6 +27,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.GrayFilter;
@@ -37,6 +41,7 @@ import javax.swing.SwingUtilities;
 import actions.Action;
 import actions.PlayerAction;
 import player.Player;
+import playerMovement.Animators;
 import playerMovement.MovePlayer;
 import resourceManagement.Avatar;
 import resourceManagement.AvatarGroup;
@@ -74,6 +79,15 @@ public class SquintGUI extends JPanel implements KeyListener {
 
 	// the number of pixels per grid square
 	public static final int MAP_DIM = 40;	
+	
+	// The delay between move requests to prevent network congestion
+	public static final int MOVE_REQUEST_DELAY = 200;	// In milliseconds
+	
+	// Whether or not to prevent move requests based on a move interval delay
+	private boolean limitMovement = false;
+	
+	// The movement limiter to keep the user from spamming move requests
+	private MoveRequestLimiter limiter = null;
 
 	// The player attached to the client/GUI
 	public Player player;
@@ -136,6 +150,10 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Set up the hashtable of players
 		players = new HashMap<Integer, Player>();
 		this.mainClient = mainClient;
+		
+		// Set up a move interval timer so that the user cannot spam move requests
+		limiter = new MoveRequestLimiter();
+		limiter.startMovementLimiter();
 	}
 
 	/**
@@ -604,6 +622,35 @@ public class SquintGUI extends JPanel implements KeyListener {
 		}		
 	}
 
+
+	/**
+	 * MoveRequestLimiter
+	 * 
+	 * Keep the player from sending too many move requests to the server
+	 * by limiting the amount of move requests based on a timer
+	 *
+	 */
+	class MoveRequestLimiter {
+		
+		// The scheduled executor
+		private final ScheduledExecutorService scheduler =
+				Executors.newScheduledThreadPool(1);
+
+		/**
+		 * Create a scheduled executor to let the user
+		 * move only every MOVE_REQUEST_DELAY
+		 */
+		public void startMovementLimiter() {
+			final Runnable limiter = new Runnable() {
+				public void run() { 
+					// Unblock the player from moving
+					limitMovement = false; 
+				}
+			};
+			scheduler.scheduleAtFixedRate(limiter, 0, MOVE_REQUEST_DELAY, TimeUnit.MILLISECONDS);
+		}
+	}
+
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -618,6 +665,11 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
+		// If the player is trying to move to quickly, limit movement
+		if (limitMovement) {
+			// Ignore the keypress and do not submit a move request
+			return;
+		}
 		// Check if the press key is in the collection of held keys
 		if (!heldKeys.contains(e.getKeyCode())) {
 			// Keep track of the pressed key's held-state
@@ -664,6 +716,10 @@ public class SquintGUI extends JPanel implements KeyListener {
 					// If the player is not jumping then send a move request to the server
 					String sendMe = PlayerAction.generateActionMessage(player.id, moveDirection);
 					mainClient.connection.send(sendMe);	
+					
+					// As soon as a move request is sent to the server block the user from 
+					// trying to move again for a set period of time
+					limitMovement = true;
 				}	        	
 			}
 		}
