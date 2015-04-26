@@ -169,6 +169,9 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * This will be called when an UPDATE_MSG is received from the server telling
 	 * us to update our knowledge of the player to match what the server knows
 	 * 
+	 * This will also be called if an INIT_MSG is received for a player that
+	 * this client already has knowledge of.
+	 * 
 	 * @param playerId	The ID of the player
 	 * @param x			The player's logical column location
 	 * @param y			The player's logical row location

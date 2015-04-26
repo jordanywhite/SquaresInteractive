@@ -144,9 +144,16 @@ public class MainClient {
 					}
 					break;
 				case ServerMessage.INIT_MSG:	
+					// Tell the GUI to initialize a player
 					PlayerInit playerInit = PlayerInit.parseFromMsg(msg);
+
+					// If the GUI does not know about this player, create a new player
 					if (!gui.players.containsKey(playerInit.playerId)) {
 						gui.createPlayer(playerInit.playerId, playerInit.avatarName, playerInit.x, playerInit.y, playerInit.direction);
+					} else {
+						// If the GUI already knows about this player, update the player's data 
+						// to make sure the client is synchronized with the server.
+						gui.updatePlayer(playerInit.playerId, playerInit.x, playerInit.y, playerInit.direction);
 					}
 					break;
 				case ServerMessage.ROOM_MSG:
