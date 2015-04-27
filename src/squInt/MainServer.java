@@ -19,8 +19,9 @@ import resourceManagement.ResourceLoader;
 import serverManagement.ServerConnectionTable;
 import serverManagement.ServerQueuedMessage;
 import actions.Action;
-import actions.PlayerInit;
-import actions.PlayerMove;
+import actions.PlayerInitMessage;
+import actions.PlayerActionMessage;
+import actions.Action.PlayerAction;
 
 /**
  * The server that hosts the interactive room.
@@ -101,7 +102,7 @@ public class MainServer {
 					Player player = playerIterator.next();
 					
 					// Generate a new init message for the player
-					String initMsg = PlayerInit.generateInitMessage(player.id, player.avatarName, player.x, player.y, player.direction);
+					String initMsg = PlayerInitMessage.generateInitMessage(player.id, player.avatarName, player.x, player.y, player.direction);
 					
 					// Broadcast the init message
 					mainServer.serverTable.sendToAll(initMsg);
@@ -121,10 +122,20 @@ public class MainServer {
 					sqm = mainServer.serverQueue.poll(SERVER_QUEUE_TIMEOUT, TimeUnit.MILLISECONDS);
 					System.out.println("SERV RCVD from " + sqm.source.getUniqueId() + ": " + sqm.message);
 					
-					if (mainServer.requestAction(PlayerMove.parseFromMsg(sqm.message))) {
-						// send diff
+					// Get the player move action message
+					PlayerActionMessage moveActionMessage = PlayerActionMessage.parseFromMessage(sqm.message);
+					
+					if (Action.isMoveAction(moveActionMessage.action)) {
+						
+						// check if the move is valid and if so broadcast the move to all clients if valid
+						if (mainServer.requestAction(moveActionMessage)) {
+							// broadcast the player movement diff
+							mainServer.serverTable.sendToAll(sqm.message);
+						}							
+					} else if (moveActionMessage.action.equals(PlayerAction.INTERACT)) {
+						// If the action is an interact action, broadcast the message to everyone
 						mainServer.serverTable.sendToAll(sqm.message);
-					}
+					}	
 				} catch (InterruptedException e) {
 					System.out.println("ERROR: Server's receive queue was interrupted!");
 				}
@@ -197,7 +208,7 @@ public class MainServer {
 		addUser(newPlayer);
 		changeMapOccupation(newPlayer.x, newPlayer.y, newPlayer.id, true);
 				
-		return PlayerInit.generateInitMessage(newPlayer.id, newPlayer.avatarName, newPlayer.x, newPlayer.y, newPlayer.direction);
+		return PlayerInitMessage.generateInitMessage(newPlayer.id, newPlayer.avatarName, newPlayer.x, newPlayer.y, newPlayer.direction);
 	}
 	
 	/**
@@ -297,23 +308,23 @@ public class MainServer {
 	 * 
 	 * THE CALLER MUST BROADCAST A VALID MOVE TO CLIENTS TODO
 	 *
-	 * @param playerMove
+	 * @param playerActionMessage
 	 *            on which we shall act on
 	 * @return true if the action is worthy, false if the action is found
 	 *         wanting
 	 */
-	public boolean requestAction(PlayerMove playerMove) {
+	public boolean requestAction(PlayerActionMessage playerActionMessage) {
 
-		if (playerMove == null) {
+		if (playerActionMessage == null) {
 			return false;
 		}
 
-		int playerId = playerMove.playerId;
+		int playerId = playerActionMessage.playerId;
 		if (!players.containsKey(playerId)) {
 			return false;
 		}
 		
-		int moveDirection = Action.getActionNum(playerMove.action);		
+		int moveDirection = Action.getActionNum(playerActionMessage.action);		
 
 		// TODO BROADCAST THE MOVE (DIFF) TO ALL CONNECTED CLIENTS
 		return isValidMove(moveDirection, playerId);

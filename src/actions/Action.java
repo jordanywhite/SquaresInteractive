@@ -55,4 +55,28 @@ public class Action {
 			return null;
 		}
 	}
+	
+	public static boolean isMoveAction(PlayerAction a) {
+		switch(a) {
+		case MOVE_DOWN:
+			return true;
+		case MOVE_LEFT:
+			return true;
+		case MOVE_UP:
+			return true;
+		case MOVE_RIGHT:
+			return true;
+		case INTERACT:
+			break;
+		case INVALID:
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+	
+	public static boolean isMoveAction(int i) {
+		return isMoveAction(getActionFromInt(i));
+	}
 }

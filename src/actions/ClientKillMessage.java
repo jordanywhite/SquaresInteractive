@@ -13,6 +13,6 @@ package actions;
  * @author Caleb Piekstra 
  *
  */
-public class ClientKill {
+public class ClientKillMessage {
 	
 }

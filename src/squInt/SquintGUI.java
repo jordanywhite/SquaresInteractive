@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.swing.GrayFilter;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -45,7 +46,7 @@ import resourceManagement.ResourceLoader;
 import resourceManagement.Texture;
 import actions.Action;
 import actions.Action.PlayerAction;
-import actions.PlayerMove;
+import actions.PlayerActionMessage;
 
 /**
  * This code is the GUI portion of a larger project being built for a networking class
@@ -242,6 +243,20 @@ public class SquintGUI extends JPanel implements KeyListener {
 		});
 	}
 
+	/**
+	 * Displays a message in a dialog
+	 * 
+	 * @param playerId	The id of the player that sent the message
+	 * @param msg		The message that the player sent
+	 */
+	public void displayMessage(int playerId, String msg) {		
+
+		JOptionPane.showMessageDialog(this,
+				"Player " + playerId + " says:\n" + msg,
+				"Message from Player " + playerId,
+				JOptionPane.PLAIN_MESSAGE);
+
+	}
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -330,6 +345,34 @@ public class SquintGUI extends JPanel implements KeyListener {
 		Point newLocation = Player.getNewPlayerPosition(player, player.direction);
 		player.x = newLocation.x;
 		player.y = newLocation.y;
+	}
+
+	/**
+	 * MoveRequestLimiter
+	 * 
+	 * Keep the player from sending too many move requests to the server
+	 * by limiting the amount of move requests based on a timer
+	 *
+	 */
+	class MoveRequestLimiter {
+		
+		// The scheduled executor
+		private final ScheduledExecutorService scheduler =
+				Executors.newScheduledThreadPool(1);
+
+		/**
+		 * Create a scheduled executor to let the user
+		 * move only every MOVE_REQUEST_DELAY
+		 */
+		public void startMovementLimiter() {
+			final Runnable limiter = new Runnable() {
+				public void run() { 
+					// Unblock the player from moving
+					limitMovement = false; 
+				}
+			};
+			scheduler.scheduleAtFixedRate(limiter, 0, MOVE_REQUEST_DELAY, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	/**___________________________________________________________________________________________**\
@@ -609,35 +652,6 @@ public class SquintGUI extends JPanel implements KeyListener {
 		}		
 	}
 
-
-	/**
-	 * MoveRequestLimiter
-	 * 
-	 * Keep the player from sending too many move requests to the server
-	 * by limiting the amount of move requests based on a timer
-	 *
-	 */
-	class MoveRequestLimiter {
-		
-		// The scheduled executor
-		private final ScheduledExecutorService scheduler =
-				Executors.newScheduledThreadPool(1);
-
-		/**
-		 * Create a scheduled executor to let the user
-		 * move only every MOVE_REQUEST_DELAY
-		 */
-		public void startMovementLimiter() {
-			final Runnable limiter = new Runnable() {
-				public void run() { 
-					// Unblock the player from moving
-					limitMovement = false; 
-				}
-			};
-			scheduler.scheduleAtFixedRate(limiter, 0, MOVE_REQUEST_DELAY, TimeUnit.MILLISECONDS);
-		}
-	}
-
 	/**___________________________________________________________________________________________**\
    /  / 
   /  |  
@@ -670,43 +684,67 @@ public class SquintGUI extends JPanel implements KeyListener {
 		}
 		// Do not process player movements unless the player is allowed to move
 		if (player.allowedToMove) {
-			PlayerAction moveAction = PlayerAction.INVALID;
+			PlayerAction action = PlayerAction.INVALID;
 			if(heldKeys.contains(KeyEvent.VK_D) || heldKeys.contains(KeyEvent.VK_RIGHT)) {
 				// The 'D' key corresponds to RIGHT
-				moveAction = PlayerAction.MOVE_RIGHT;
+				action = PlayerAction.MOVE_RIGHT;
 			} else if(heldKeys.contains(KeyEvent.VK_W) || heldKeys.contains(KeyEvent.VK_UP)) {
 				// The 'W' key corresponds to UP
-				moveAction = PlayerAction.MOVE_UP;
+				action = PlayerAction.MOVE_UP;
 			} else if(heldKeys.contains(KeyEvent.VK_A) || heldKeys.contains(KeyEvent.VK_LEFT)) {
 				// The 'A' key corresonds to LEFT
-				moveAction = PlayerAction.MOVE_LEFT;
+				action = PlayerAction.MOVE_LEFT;
 			} else if(heldKeys.contains(KeyEvent.VK_S) || heldKeys.contains(KeyEvent.VK_DOWN)) {
 				// The 'S' key corresponds to DOWN
-				moveAction = PlayerAction.MOVE_DOWN;
+				action = PlayerAction.MOVE_DOWN;
 			} else if(heldKeys.contains(KeyEvent.VK_SPACE)) {
 				// The 'SPACE' key makes the player jump
 				player.isJumping = true;
-				moveAction = Action.getActionFromInt(player.direction);
+				action = Action.getActionFromInt(player.direction);
 			} else if(heldKeys.contains(KeyEvent.VK_Q)) {
 				// The 'Q' key makes the player spin counter-clockwise
 				int modVal = Player.MoveDirection.RIGHT + 1;
 				int rotatedDirection = ((((player.direction-1) % modVal) + modVal) % modVal);
-				moveAction = Action.getActionFromInt(rotatedDirection);
+				action = Action.getActionFromInt(rotatedDirection);
 			} else if(heldKeys.contains(KeyEvent.VK_E)) {
 				// The 'E' key makes the player spin clockwise
 				int rotatedDirection = (player.direction + 1) % (Player.MoveDirection.RIGHT + 1);
-				moveAction = Action.getActionFromInt(rotatedDirection);
+				action = Action.getActionFromInt(rotatedDirection);
+			} else if (heldKeys.contains(KeyEvent.VK_T)) {
+				action = PlayerAction.INTERACT;
 			}
 
 			// Check to see if a "movement key" was pressed
-			if (moveAction != PlayerAction.INVALID) { 
+			if (action != PlayerAction.INVALID) { 
 				// If the player is jumping, handle the movement locally
 				if (player.isJumping) {
-					movePlayer(Action.getActionNum(moveAction), player.id);
+					movePlayer(Action.getActionNum(action), player.id);
 				} else {
-					// If the player is not jumping then send a move request to the server
-					String sendMe = PlayerMove.generateMoveMessage(player.id, moveAction);
-					mainClient.connection.send(sendMe);	
+					
+					// The message that will be sent to the server
+					String sendMe = null;
+					
+					// If the action is a move action send a move message to the server
+					if (Action.isMoveAction(action)) {
+						// If the player is not jumping then send a move request to the server
+						sendMe = PlayerActionMessage.generateActionMessage(player.id, action, null);
+					} else if (action == PlayerAction.INTERACT) {
+						// If the action is an interaction send an interact message to the server
+						String playersMessage = (String)JOptionPane.showInputDialog(
+										this,
+										"Enter the message you want to send to everyone:\n",
+										"Broadcast Custom Message",
+										JOptionPane.PLAIN_MESSAGE,
+										null,
+										null,
+										"Hi everyone!");
+						
+						sendMe = PlayerActionMessage.generateActionMessage(player.id, action, playersMessage);
+					}			
+					
+					if (sendMe != null && !sendMe.equals("")) {
+						mainClient.connection.send(sendMe);	
+					}
 					
 					// As soon as a move request is sent to the server block the user from 
 					// trying to move again for a set period of time

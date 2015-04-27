@@ -9,10 +9,10 @@ package actions;
  * @author Caleb Piekstra 
  *
  */
-public class PlayerInit extends PlayerUpdate {
+public class PlayerInitMessage extends PlayerUpdateMessage {
 	public String avatarName;
 
-	public PlayerInit(int playerId, String avatarName, int x, int y, int direction) {
+	public PlayerInitMessage(int playerId, String avatarName, int x, int y, int direction) {
 		super(playerId, x, y, direction);
 		this.avatarName = avatarName;
 	}
@@ -34,12 +34,12 @@ public class PlayerInit extends PlayerUpdate {
 	 * @param msg message to parse
 	 * @return parsed packet
 	 */
-	public static PlayerInit parseFromMsg(String msg) {
+	public static PlayerInitMessage parseFromMsg(String msg) {
 		if(!isValidMessage(msg)) {
 			return null;
 		}
 		
-		PlayerInit parsedPacket = null;
+		PlayerInitMessage parsedPacket = null;
 		
 		try {
 			String[] splitMsg = msg.split("#");
@@ -53,7 +53,7 @@ public class PlayerInit extends PlayerUpdate {
 				int y = Integer.parseInt(payload[3]);
 				int direction = Integer.parseInt(payload[4]);
 				
-				parsedPacket = new PlayerInit(playerId, avatarName, x, y, direction);
+				parsedPacket = new PlayerInitMessage(playerId, avatarName, x, y, direction);
 			}
 			
 		} catch (NumberFormatException e) {

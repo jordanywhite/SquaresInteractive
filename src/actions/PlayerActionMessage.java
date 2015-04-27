@@ -16,8 +16,9 @@ import actions.Action.PlayerAction;
  * @author Jordan White
  *
  */
-public class PlayerMove extends ServerMessage {
+public class PlayerActionMessage extends ServerMessage {
 	public PlayerAction action;
+	public String message;
 	
 	/** 
 	 * constructor
@@ -25,31 +26,32 @@ public class PlayerMove extends ServerMessage {
 	 * @param playerId player producing action
 	 * @param action direction player is moving
 	 */
-	public PlayerMove(int playerId, PlayerAction action) {
+	public PlayerActionMessage(int playerId, PlayerAction action, String message) {
 		this.playerId = playerId;
 		this.action = action;
+		this.message = message;
 	}
 	
 	/**
-	 * generateActionMessage - creates server message
+	 * generateMoveMessage - creates server message
 	 *  
-	 * @param playerId	The id of the player requesting the action
+	 * @param playerId	The ID of the player requesting the action
 	 * @param actionInt	The player action's int value
 	 * @return message	The move message
 	 */
-	public static String generateMoveMessage(int playerId, int actionInt) {
-		return "SI#" + ServerMessage.MOVE_MSG + "#" + playerId + "@" + actionInt;
+	public static String generateActionMessage(int playerId, int actionInt, String msg) {
+		return "SI#" + ServerMessage.ACTION_MSG + "#" + playerId + "@" + actionInt + "@" + msg;
 	}
 	
 	/**
-	 * generateActionMessage - creates server message
+	 * generateMoveMessage - creates server message
 	 *  
-	 * @param playerId	The id of the player requesting the action
+	 * @param playerId	The ID of the player requesting the action
 	 * @param action	The player action
 	 * @return message	The move message
 	 */
-	public static String generateMoveMessage(int playerId, PlayerAction action) {
-		return "SI#" + ServerMessage.MOVE_MSG + "#" + playerId + "@" + Action.getActionNum(action);
+	public static String generateActionMessage(int playerId, PlayerAction action, String msg) {
+		return generateActionMessage(playerId, Action.getActionNum(action), msg);
 	}
 	
 	/**
@@ -58,24 +60,25 @@ public class PlayerMove extends ServerMessage {
 	 * @param msg message to parse
 	 * @return parsed packet
 	 */
-	public static PlayerMove parseFromMsg(String msg) {
+	public static PlayerActionMessage parseFromMessage(String msg) {
 		if(!isValidMessage(msg)) {
 			return null;
 		}
 		
-		PlayerMove parsedPacket = null;
+		PlayerActionMessage parsedPacket = null;
 		
 		try {
 			String[] splitMsg = msg.split("#");
 			int msgType = Integer.parseInt(splitMsg[1]);
 			String[] payload = splitMsg[2].split("@");
 			
-			if(msgType == ServerMessage.MOVE_MSG) {
+			if(msgType == ServerMessage.ACTION_MSG) {
 				int playerId = Integer.parseInt(payload[0]);
 				PlayerAction action = Action.getActionFromInt(Integer.parseInt(payload[1]));
+				String message = payload[2];
 				
 				if(action != null) {
-					parsedPacket = new PlayerMove(playerId, action);
+					parsedPacket = new PlayerActionMessage(playerId, action, message);
 				}
 			}
 			

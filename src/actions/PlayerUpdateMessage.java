@@ -17,7 +17,7 @@ package actions;
  * @author Caleb Piekstra
  *
  */
-public class PlayerUpdate extends ServerMessage{
+public class PlayerUpdateMessage extends ServerMessage{
 	public int x; 
 	public int y; 
 	public int direction; 
@@ -30,7 +30,7 @@ public class PlayerUpdate extends ServerMessage{
 	 * @param y			player's logical row location
 	 * @param direction	direction the player should be facing
 	 */
-	public PlayerUpdate(int playerId, int x, int y, int direction) {
+	public PlayerUpdateMessage(int playerId, int x, int y, int direction) {
 		this.playerId = playerId;
 		this.x = x;
 		this.y = y;
@@ -54,12 +54,12 @@ public class PlayerUpdate extends ServerMessage{
 	 * @param msg message to parse
 	 * @return parsed packet
 	 */
-	public static PlayerUpdate parseFromMsg(String msg) {
+	public static PlayerUpdateMessage parseFromMsg(String msg) {
 		if(!isValidMessage(msg)) {
 			return null;
 		}
 		
-		PlayerUpdate parsedPacket = null;
+		PlayerUpdateMessage parsedPacket = null;
 		
 		try {
 			String[] splitMsg = msg.split("#");
@@ -72,7 +72,7 @@ public class PlayerUpdate extends ServerMessage{
 				int y = Integer.parseInt(payload[2]);
 				int direction = Integer.parseInt(payload[3]);
 				
-				parsedPacket = new PlayerUpdate(playerId, x, y, direction);
+				parsedPacket = new PlayerUpdateMessage(playerId, x, y, direction);
 			}
 			
 		} catch (NumberFormatException e) {

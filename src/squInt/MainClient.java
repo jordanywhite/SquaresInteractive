@@ -8,9 +8,10 @@ import javax.swing.JOptionPane;
 
 import serverManagement.DataPort;
 import actions.Action;
-import actions.PlayerInit;
-import actions.PlayerMove;
-import actions.PlayerUpdate;
+import actions.Action.PlayerAction;
+import actions.PlayerActionMessage;
+import actions.PlayerInitMessage;
+import actions.PlayerUpdateMessage;
 import actions.ServerMessage;
 
 /**
@@ -231,36 +232,43 @@ public class MainClient {
 				
 				// Figure out what to do based on the type of message
 				switch (msgType) {
-				case ServerMessage.MOVE_MSG:
-					// Tell the GUI to move the player
-					PlayerMove playerMove = PlayerMove.parseFromMsg(msg);
-					if (playerMove != null) {
-						gui.movePlayer(Action.getActionNum(playerMove.action), 
-								playerMove.playerId);
+				case ServerMessage.ACTION_MSG:
+					// Tell the GUI what to do
+					PlayerActionMessage playerActionMessage = PlayerActionMessage.parseFromMessage(msg);
+					
+					if (playerActionMessage != null) {
+						// If the action is a move action, tell the GUI to move the player
+						if (Action.isMoveAction(playerActionMessage.action)) {
+							gui.movePlayer(playerActionMessage.action, 
+									playerActionMessage.playerId);
+						} else if (playerActionMessage.action == PlayerAction.INTERACT) {
+							// If the action is an interaction, display the message to the client
+							gui.displayMessage(playerActionMessage.playerId, playerActionMessage.message);
+						}
 					}
 					break;
 				case ServerMessage.INIT_MSG:	
 					// Tell the GUI to initialize a player
-					PlayerInit playerInit = PlayerInit.parseFromMsg(msg);
+					PlayerInitMessage playerInitMessage = PlayerInitMessage.parseFromMsg(msg);
 
 					// If the GUI does not know about this player, create a new player
-					if (!gui.players.containsKey(playerInit.playerId)) {
-						gui.createPlayer(playerInit.playerId, playerInit.avatarName, playerInit.x, playerInit.y, playerInit.direction);
+					if (!gui.players.containsKey(playerInitMessage.playerId)) {
+						gui.createPlayer(playerInitMessage.playerId, playerInitMessage.avatarName, playerInitMessage.x, playerInitMessage.y, playerInitMessage.direction);
 					} else {
 						// If the GUI already knows about this player, update the player's data 
 						// to make sure the client is synchronized with the server.
-						gui.updatePlayer(playerInit.playerId, playerInit.x, playerInit.y, playerInit.direction);
+						gui.updatePlayer(playerInitMessage.playerId, playerInitMessage.x, playerInitMessage.y, playerInitMessage.direction);
 					}
 					break;
 				case ServerMessage.ROOM_MSG:
 					break;
 				case ServerMessage.UPDATE_MSG:	
 					// Tell the GUI to update a player
-					PlayerUpdate playerUpdate = PlayerUpdate.parseFromMsg(msg);
+					PlayerUpdateMessage playerUpdateMessage = PlayerUpdateMessage.parseFromMsg(msg);
 
 					// If the GUI knows about this player, update it
-					if (gui.players.containsKey(playerUpdate.playerId)) {
-						gui.updatePlayer(playerUpdate.playerId, playerUpdate.x, playerUpdate.y, playerUpdate.direction);
+					if (gui.players.containsKey(playerUpdateMessage.playerId)) {
+						gui.updatePlayer(playerUpdateMessage.playerId, playerUpdateMessage.x, playerUpdateMessage.y, playerUpdateMessage.direction);
 					}
 					break;
 				case ServerMessage.INVALID_MSG:

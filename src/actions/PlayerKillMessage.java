@@ -13,5 +13,5 @@ package actions;
  * @author Caleb Piekstra 
  *
  */
-public class PlayerKill {
+public class PlayerKillMessage {
 }

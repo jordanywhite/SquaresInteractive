@@ -14,3 +14,4 @@ Networking Project
 * Move Left		A				|	LeftArrow
 * Move Down		S				|	DownArrow
 * Move Right	D				|	RightArrow
+* Global Msg	T
