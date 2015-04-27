@@ -56,6 +56,12 @@ public class Action {
 		}
 	}
 	
+	/**
+	 * Returns whether or not the player action is a move action
+	 * 
+	 * @param a	The player action to check
+	 * @return	Whether or not the player action is a move action
+	 */
 	public static boolean isMoveAction(PlayerAction a) {
 		switch(a) {
 		case MOVE_DOWN:
@@ -76,6 +82,12 @@ public class Action {
 		return false;
 	}
 	
+	/**
+	 * Returns whether or not the player action is a move action
+	 * 
+	 * @param i	The number for the player action to check
+	 * @return	Whether or not the player action is a move action
+	 */
 	public static boolean isMoveAction(int i) {
 		return isMoveAction(getActionFromInt(i));
 	}
