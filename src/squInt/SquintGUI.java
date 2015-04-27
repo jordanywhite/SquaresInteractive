@@ -739,6 +739,10 @@ public class SquintGUI extends JPanel implements KeyListener {
 										null,
 										"Hi everyone!");
 						
+						// Because our message syntax uses the '#' and '@' symbols, remove them from the message
+						playersMessage = playersMessage.replace("#", "").replace("@", "");
+						
+						// Generate the message to send
 						sendMe = PlayerActionMessage.generateActionMessage(player.id, action, playersMessage);
 					}			
 					
