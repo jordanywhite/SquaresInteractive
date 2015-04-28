@@ -196,9 +196,12 @@ public class SquintGUI extends JPanel implements KeyListener {
 	 * @param direction	The direction that the player is facing
 	 */
 	public void updatePlayer(int playerId, int x, int y, int direction) {
-		
+				
 		// Make sure this client has knowledge of the player
 		if (players.containsKey(playerId)) {
+			
+			// Reset the square where the player used to be
+			changeMapOccupation(player.x, player.y, player.id, false);
 			
 			// Get the player
 			Player player = players.get(playerId);
@@ -207,7 +210,11 @@ public class SquintGUI extends JPanel implements KeyListener {
 			player.x = x;
 			player.y = y;
 			player.direction = direction;
+
+			// Set the square where the player is now
+			changeMapOccupation(player.x, player.y, player.id, true);
 		}
+		
 	}
 
 	/**
