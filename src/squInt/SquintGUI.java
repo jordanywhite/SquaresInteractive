@@ -200,11 +200,11 @@ public class SquintGUI extends JPanel implements KeyListener {
 		// Make sure this client has knowledge of the player
 		if (players.containsKey(playerId)) {
 			
-			// Reset the square where the player used to be
-			changeMapOccupation(player.x, player.y, player.id, false);
-			
 			// Get the player
 			Player player = players.get(playerId);
+			
+			// Reset the square where the player used to be
+			changeMapOccupation(player.x, player.y, player.id, false);
 			
 			// Update the player's status
 			player.x = x;
